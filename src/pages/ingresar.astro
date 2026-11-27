@@ -1,0 +1,180 @@
+---
+import Panel from '../layouts/Panel.astro';
+import Estrella from '../components/Estrella.astro';
+import { HAY_SUPABASE } from '../lib/conexion';
+---
+<Panel titulo="Entrar" zona="acceso">
+  <div class="acceso">
+    <div class="acceso__cabecera">
+      <h1 class="acceso__titulo">entrar</h1>
+      <p class="acceso__lema">Solo para productores invitados y para MusicMafia.</p>
+      <Estrella semilla="acceso" class="acceso__estrella" />
+    </div>
+
+    <form class="hoja formulario" data-entrar novalidate>
+      <div class="campo">
+        <label for="correo">correo</label>
+        <input id="correo" name="correo" type="email" autocomplete="username" required inputmode="email" />
+      </div>
+      <div class="campo">
+        <label for="clave">contraseña</label>
+        <input id="clave" name="clave" type="password" autocomplete="current-password" required />
+      </div>
+      <p class="mensaje" data-mensaje hidden></p>
+      <div class="acciones">
+        <button class="boton" type="submit">entrar</button>
+        <button class="enlace-boton" type="button" data-olvide>olvidé mi contraseña</button>
+      </div>
+    </form>
+
+    <form class="hoja formulario" data-olvido hidden novalidate>
+      <h2 class="hoja__titulo">nueva contraseña</h2>
+      <p class="ayuda">Escribe el correo de tu cuenta y te mandamos un enlace para elegir otra. Vence en 24 horas.</p>
+      <div class="campo">
+        <label for="correo-olvido">correo</label>
+        <input id="correo-olvido" name="correo" type="email" autocomplete="username" required inputmode="email" />
+      </div>
+      <p class="mensaje" data-mensaje hidden></p>
+      <div class="acciones">
+        <button class="boton" type="submit">mandar enlace</button>
+        <button class="enlace-boton" type="button" data-volver>volver</button>
+      </div>
+    </form>
+
+    {!HAY_SUPABASE && (
+      <div class="hoja ensayo" data-ensayo-caja>
+        <h2 class="hoja__titulo">ensayo</h2>
+        <p class="ayuda">Sin Supabase conectado, el panel funciona en este navegador. Entra con una de estas cuentas de prueba:</p>
+        <div class="acciones">
+          <button class="boton boton--secundario" type="button" data-ensayo="productor">entrar como productor</button>
+          <button class="boton boton--secundario" type="button" data-ensayo="admin">entrar como musicmafia</button>
+        </div>
+      </div>
+    )}
+
+    <p class="acceso__nota">
+      ¿No tienes cuenta? En MusicMafia nadie se inscribe: se entra por invitación.{' '}
+      <a href="/#asi-funciona">Así funciona</a>.
+    </p>
+  </div>
+</Panel>
+
+<script>
+  import { datos } from '../scripts/panel/datos';
+  import { $, avisar, ocupado } from '../scripts/panel/ui';
+
+  const d = await datos();
+  const destino = async () => {
+    const volver = new URLSearchParams(location.search).get('volver');
+    if (volver && /^\/(panel|admin)$/.test(volver)) return volver;
+    return (await d.esAdmin()) ? '/admin' : '/panel';
+  };
+
+  if (await d.sesion()) location.replace(await destino());
+
+  const entrar = $<HTMLFormElement>('[data-entrar]');
+  if (new URLSearchParams(location.search).get('cuenta') === 'borrada') {
+    avisar($('[data-mensaje]', entrar), 'Tu cuenta se borró. Gracias por haber sido parte de MusicMafia.', 'ok');
+  }
+  const olvido = $<HTMLFormElement>('[data-olvido]');
+
+  entrar.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const correo = $<HTMLInputElement>('#correo').value;
+    const clave = $<HTMLInputElement>('#clave').value;
+    const mensaje = $('[data-mensaje]', entrar);
+    if (!correo || !clave) return avisar(mensaje, 'Escribe tu correo y tu contraseña.');
+    ocupado($<HTMLButtonElement>('[type=submit]', entrar), async () => {
+      await d.entrar(correo, clave);
+      location.replace(await destino());
+    }, mensaje);
+  });
+
+  $('[data-olvide]').addEventListener('click', () => {
+    $<HTMLInputElement>('#correo-olvido').value = $<HTMLInputElement>('#correo').value;
+    entrar.hidden = true;
+    olvido.hidden = false;
+    $<HTMLInputElement>('#correo-olvido').focus();
+  });
+
+  $('[data-volver]').addEventListener('click', () => {
+    olvido.hidden = true;
+    entrar.hidden = false;
+  });
+
+  olvido.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const correo = $<HTMLInputElement>('#correo-olvido').value.trim();
+    const mensaje = $('[data-mensaje]', olvido);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) return avisar(mensaje, 'Ese correo no parece válido.');
+    ocupado($<HTMLButtonElement>('[type=submit]', olvido), async () => {
+      const enlace = await d.pedirCambioDeClave(correo);
+      // El mismo aviso exista o no la cuenta, para no revelar quién está registrado.
+      avisar(mensaje, 'Si ese correo tiene una cuenta, en unos minutos te llega el enlace. Revisa también el spam.', 'ok');
+      if (enlace) {
+        mensaje.append(' En ensayo no se mandan correos: ');
+        const a = Object.assign(document.createElement('a'), { href: enlace, textContent: 'abrir el enlace' });
+        mensaje.append(a, '.');
+      }
+    }, mensaje);
+  });
+
+  for (const b of document.querySelectorAll<HTMLButtonElement>('[data-ensayo]')) {
+    b.addEventListener('click', async () => {
+      const { CUENTAS_ENSAYO } = await import('../scripts/panel/ensayo');
+      const cuenta = CUENTAS_ENSAYO[b.dataset.ensayo as 'productor' | 'admin'];
+      await ocupado(b, async () => {
+        await d.entrar(cuenta.correo, cuenta.clave);
+        location.replace(await destino());
+      }, $('[data-mensaje]', entrar));
+    });
+  }
+</script>
+
+<style>
+  .acceso {
+    display: grid;
+    gap: 24px;
+    max-width: 560px;
+  }
+
+  .acceso__cabecera {
+    position: relative;
+  }
+
+  .acceso__titulo {
+    font-size: clamp(4rem, 14vw, 9rem);
+    font-weight: 900;
+    font-stretch: 80%;
+    line-height: 0.8;
+    letter-spacing: -0.07em;
+  }
+
+  .acceso__lema {
+    margin-top: 14px;
+    font-size: var(--t-entrada);
+    font-weight: 600;
+  }
+
+  .acceso :global(.acceso__estrella) {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    width: clamp(70px, 14vw, 120px);
+    height: auto;
+    color: var(--hoja);
+    transform: rotate(12deg);
+  }
+
+  .hoja + .hoja {
+    margin-top: 0;
+  }
+
+  .acceso__nota {
+    font-weight: 600;
+  }
+
+  .acceso__nota a {
+    font-weight: 800;
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+import Legal from '../layouts/Legal.astro';
+import TablaLegal from '../components/TablaLegal.astro';
+import { ALMACENAMIENTO } from '../lib/legal';
+---
+<Legal titulo="Política de cookies" descripcion="Qué guarda MusicMafia en tu dispositivo y cómo cambiar tu elección.">
+  <p>
+    Las cookies y el almacenamiento local son pequeños datos que una web guarda en tu navegador. MusicMafia usa muy
+    pocos, y ninguno sirve para publicidad ni para seguirte por otras webs.
+  </p>
+
+  <section class="resumen" aria-labelledby="t-eleccion">
+    <h2 id="t-eleccion">Tu elección</h2>
+    <p data-estado-cookies>Cargando tu elección…</p>
+    <p><button type="button" class="boton boton--secundario" data-abrir-cookies>Cambiar mi elección</button></p>
+  </section>
+
+  <h2 id="que-usamos">Qué usamos</h2>
+  <TablaLegal
+    descripcion="Cookies y almacenamiento local que usa MusicMafia"
+    columnas={[
+      { clave: 'nombre', titulo: 'Nombre' },
+      { clave: 'de', titulo: 'De quién' },
+      { clave: 'categoria', titulo: 'Tipo' },
+      { clave: 'para', titulo: 'Para qué' },
+      { clave: 'duracion', titulo: 'Duración' },
+    ]}
+    filas={ALMACENAMIENTO as unknown as Record<string, string>[]}
+  />
+
+  <h2 id="tipos">Esencial y medición</h2>
+  <p>
+    <strong>Esencial:</strong> sin esto la web no funciona o no es segura. No pide permiso porque no se puede apagar sin
+    romper algo: recordar tu elección, mantener la sesión de un productor y frenar ataques.
+  </p>
+  <p>
+    <strong>Medición:</strong> cuenta cuántas veces se visita cada página, de forma anónima y sin cookies. Nos ayuda a
+    saber qué perfiles interesan más. Solo se activa si eliges «Permitir medición», y puedes retirarla cuando quieras.
+  </p>
+
+  <h2 id="lo-que-no">Lo que no usamos</h2>
+  <ul>
+    <li>Cookies de publicidad o de redes sociales.</li>
+    <li>Contenido incrustado de Instagram u otras redes, que traería sus propias cookies. Los enlaces a Instagram solo te llevan allí cuando haces clic.</li>
+    <li>Herramientas que crean un perfil tuyo o te reconocen entre visitas.</li>
+  </ul>
+
+  <h2 id="borrar">Cómo borrarlas</h2>
+  <p>
+    Puedes borrar las cookies y el almacenamiento local de esta web desde la configuración de privacidad de tu
+    navegador. Si lo haces, te volveremos a preguntar por la medición en tu próxima visita.
+  </p>
+
+  <h2 id="cambios">Si esto cambia</h2>
+  <p>
+    Si algún día usamos algo más que no sea esencial, actualizaremos esta página y te volveremos a preguntar antes de
+    activarlo.
+  </p>
+</Legal>

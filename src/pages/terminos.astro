@@ -1,0 +1,203 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { SITIO, gmail } from '../lib/sitio';
+import { LEGAL, ACEPTACIONES, AVISO_PRIVACIDAD, RESPONSABLE_TEXTO } from '../lib/legal';
+
+const indice = [
+  { id: 'que-es', titulo: 'Qué es MusicMafia' },
+  { id: 'visitantes', titulo: 'Si visitas la web' },
+  { id: 'cuentas', titulo: 'Cuentas de productor' },
+  { id: 'contenido', titulo: 'Tu música y tus derechos' },
+  { id: 'licencia', titulo: 'Permiso que nos das' },
+  { id: 'prohibido', titulo: 'Lo que no se permite' },
+  { id: 'reclamos', titulo: 'Reclamos por derechos de autor' },
+  { id: 'cierre', titulo: 'Retiro de perfiles y cierre de cuentas' },
+  { id: 'servicio', titulo: 'El servicio' },
+  { id: 'responsabilidad', titulo: 'Responsabilidad' },
+  { id: 'marca', titulo: 'Marca y diseño' },
+  { id: 'cambios', titulo: 'Cambios' },
+  { id: 'ley', titulo: 'Ley aplicable' },
+  { id: 'aceptaciones', titulo: 'Lo que acepta un productor' },
+];
+---
+<Legal titulo="Términos y condiciones" descripcion="Las reglas de uso de MusicMafia para visitantes y productores." indice={indice}>
+  <p>
+    Estos términos regulan el uso de {SITIO.dominio}, operada por {RESPONSABLE_TEXTO} («MusicMafia», «nosotros»).
+    Si visitas la web, los aceptas al usarla. Si eres productor, los aceptas de forma expresa al activar tu cuenta. La
+    aceptación por medios electrónicos es válida según la Ley 527 de 1999.
+  </p>
+
+  <h2 id="que-es">1. Qué es MusicMafia</h2>
+  <p>
+    Una web para exponer la música de un grupo cerrado de productores elegidos por MusicMafia. Es una muestra, no una
+    tienda: no se venden beats ni licencias, no se cobran comisiones y no intermediamos en acuerdos. Si quieres usar un
+    beat, lo hablas directamente con su productor por Instagram o correo, y lo que acuerden es solo entre ustedes.
+  </p>
+
+  <h2 id="visitantes">2. Si visitas la web</h2>
+  <p>Puedes escuchar los beats y navegar libremente y gratis. No puedes:</p>
+  <ul>
+    <li>Descargar, grabar, copiar o redistribuir los beats, ni usarlos en canciones, videos o publicaciones, sin el permiso de su productor.</li>
+    <li>Extraer contenido de forma automática (scraping) ni usarlo para entrenar sistemas de inteligencia artificial.</li>
+    <li>Intentar entrar a cuentas ajenas o afectar el funcionamiento de la web.</li>
+  </ul>
+  <p>Cada beat pertenece a su productor. MusicMafia no puede darte permiso para usarlo.</p>
+
+  <h2 id="cuentas">3. Cuentas de productor</h2>
+  <ul>
+    <li>Solo se entra por invitación. MusicMafia decide libremente a quién invitar, sin que exista un derecho a ser invitado.</li>
+    <li>Debes ser mayor de {LEGAL.edadMinima} años y dar datos verdaderos.</li>
+    <li>La cuenta es personal: no la prestes ni la vendas, y cuida tu contraseña. Lo que se haga con ella es tu responsabilidad.</li>
+    <li>Tu perfil se revisa antes de publicarse y puede quedar sin publicar si no cumple estos términos.</li>
+    <li>En tu perfil solo se enlazan Instagram, correo y, si quieres, tu canal de YouTube y tu perfil de Spotify. No se permiten otros enlaces ni datos de pago.</li>
+  </ul>
+
+  <h2 id="contenido">4. Tu música y tus derechos</h2>
+  <p>
+    Lo que subes sigue siendo tuyo. MusicMafia no adquiere ningún derecho de autor sobre tus beats, portadas, fotos ni
+    textos, y tus derechos morales quedan intactos.
+  </p>
+  <p>
+    Al subir un beat declaras que eres su autor o que tienes los permisos necesarios, incluidos los samples y cualquier
+    voz o instrumento de terceros, y que publicarlo no infringe derechos de nadie (Ley 23 de 1982 y Decisión Andina 351
+    de 1993). Si un tercero reclama por algo que subiste, responderás tú frente a él.
+  </p>
+  <p>
+    Te recomendamos subir un fragmento de cada beat (por ejemplo, un minuto con tu tag de voz) y no el beat completo
+    ni tus archivos originales: cualquier cosa que suena en una página se puede grabar, y MusicMafia no puede
+    impedirlo del todo.
+  </p>
+
+  <h2 id="licencia">5. Permiso que nos das</h2>
+  <p>
+    Para que tu perfil funcione nos das un permiso gratuito, no exclusivo y mundial para alojar, reproducir en
+    streaming y mostrar tu contenido en la web, y para hacer las adaptaciones técnicas necesarias, como comprimir el
+    audio, calcular su forma de onda o recortar imágenes.
+  </p>
+  <p>
+    También nos permites mencionar tu nombre artístico y mostrar tu foto, tus portadas y fragmentos de tus beats en los
+    canales de MusicMafia para darte a conocer, siempre identificándote como autor.
+  </p>
+  <p>
+    El permiso termina cuando quitas el contenido o cierras tu cuenta. Las publicaciones que ya se hayan hecho en redes
+    pueden quedarse, salvo que pidas retirarlas; en ese caso las quitaremos en un máximo de {LEGAL.diasBorrado} días.
+  </p>
+
+  <h2 id="prohibido">6. Lo que no se permite</h2>
+  <ul>
+    <li>Contenido que no sea tuyo o que no tengas permiso para publicar.</li>
+    <li>Contenido ilegal, que incite al odio o a la violencia, o que involucre a menores de forma inapropiada.</li>
+    <li>Hacerse pasar por otra persona o artista.</li>
+    <li>Archivos con virus o cualquier cosa pensada para dañar la web o a sus visitantes.</li>
+    <li>Usar el perfil para vender, cobrar o recoger datos de los visitantes.</li>
+  </ul>
+
+  <h2 id="reclamos">7. Reclamos por derechos de autor</h2>
+  <p>
+    Si crees que un beat o una imagen infringe tus derechos, escribe a{' '}
+    <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a> con tu nombre, la obra afectada, el enlace
+    donde aparece y por qué crees que te pertenece. Podemos retirar el contenido mientras se revisa, y avisaremos al
+    productor para que pueda responder.
+  </p>
+
+  <h2 id="cierre">8. Retiro de perfiles y cierre de cuentas</h2>
+  <ul>
+    <li>Puedes quitar cualquier beat o cerrar tu cuenta desde tu panel cuando quieras, sin dar explicaciones. Tu perfil deja de verse en pocos minutos y tus datos se borran en un máximo de {LEGAL.diasBorrado} días.</li>
+    <li>Podemos retirar contenido o cerrar una cuenta, sin aviso previo, si incumple estos términos o si hay un riesgo legal.</li>
+    <li>Como MusicMafia es una selección, también podemos dejar de mostrar un perfil por decisión editorial. En ese caso te avisaremos con al menos {LEGAL.diasAviso} días de anticipación.</li>
+  </ul>
+
+  <h2 id="servicio">9. El servicio</h2>
+  <p>
+    MusicMafia es gratuita y se ofrece tal como está. Puede tener interrupciones, cambiar o dejar de funcionar.
+    No es un servicio de copias de seguridad: guarda siempre tus propios archivos.
+  </p>
+
+  <h2 id="responsabilidad">10. Responsabilidad</h2>
+  <p>
+    En la medida que permita la ley colombiana, MusicMafia no responde por el contenido que publican los productores,
+    por los acuerdos entre productores y visitantes, por lo que pase en Instagram, en el correo, en YouTube o en Spotify, ni por usos no
+    autorizados de los beats por parte de terceros. Esto no limita los derechos que la ley te reconoce y que no se
+    pueden renunciar.
+  </p>
+
+  <h2 id="marca">11. Marca y diseño</h2>
+  <p>
+    El nombre MusicMafia, su logo y el diseño de la web pertenecen a {SITIO.responsable.nombre}. No los uses sin
+    permiso, salvo para enlazar a la web o a tu perfil.
+  </p>
+
+  <h2 id="cambios">12. Cambios</h2>
+  <p>
+    Si cambiamos estos términos de forma importante, avisaremos a los productores por correo con al menos
+    {LEGAL.diasAviso} días de anticipación y les pediremos aceptarlos de nuevo al entrar a su panel. Si no estás de
+    acuerdo, puedes cerrar tu cuenta.
+  </p>
+
+  <h2 id="ley">13. Ley aplicable</h2>
+  <p>
+    Estos términos se rigen por las leyes de Colombia. Cualquier diferencia se intentará resolver primero hablando, en
+    {SITIO.contacto.correo}. Si no es posible, la resolverán los jueces de Bogotá D.C.
+  </p>
+
+  <h2 id="aceptaciones">14. Lo que acepta un productor al activar su cuenta</h2>
+  <p>
+    Así se ven las casillas al activar una cuenta. Las obligatorias son necesarias para continuar; la de novedades es
+    opcional y viene sin marcar. Cada una se guarda con su fecha, hora y la versión de estos documentos.
+  </p>
+  <ul class="casillas">
+    {ACEPTACIONES.map((a) => (
+      <li>
+        <span class="casillas__caja" aria-hidden="true"></span>
+        <span>
+          {a.texto}
+          <span class="casillas__tipo">{a.obligatoria ? 'Obligatoria' : 'Opcional'}</span>
+        </span>
+      </li>
+    ))}
+  </ul>
+  <p class="aviso">{AVISO_PRIVACIDAD}</p>
+</Legal>
+
+<style>
+  .casillas {
+    display: grid;
+    gap: 10px;
+    padding: 20px 24px !important;
+    border: 2px dashed var(--negro);
+    background: var(--hoja-2);
+    list-style: none;
+    max-width: none !important;
+  }
+
+  .casillas li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 12px;
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .casillas__caja {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    border: 1.5px solid var(--tinta-3);
+    border-radius: 6px;
+    background: var(--blanco);
+  }
+
+  .casillas__tipo {
+    display: block;
+    margin-top: 2px;
+    color: var(--tinta-2);
+    font-size: var(--t-micro);
+    font-weight: 600;
+  }
+
+  .aviso {
+    color: var(--tinta-2);
+    font-size: var(--t-chica);
+  }
+</style>

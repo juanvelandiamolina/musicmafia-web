@@ -1,0 +1,79 @@
+---
+// Cambio de contraseña: aquí llega el enlace del correo (?token_hash=…&type=recovery).
+import Panel from '../layouts/Panel.astro';
+---
+<Panel titulo="Nueva contraseña" zona="acceso">
+  <div class="restablecer">
+    <p class="cargando" data-paso="verificando">abriendo el enlace…</p>
+
+    <div class="hoja" data-paso="invalido" hidden>
+      <h1 class="hoja__titulo">este enlace no sirve.</h1>
+      <p class="hoja__intro" data-motivo></p>
+      <p class="hoja__intro">Funcionan una sola vez y vencen en 24 horas. <a href="/ingresar">Pide otro desde la entrada</a>.</p>
+    </div>
+
+    <form class="hoja formulario" data-paso="formulario" hidden novalidate>
+      <h1 class="hoja__titulo">nueva contraseña.</h1>
+      <p class="ayuda">Al menos 10 caracteres.</p>
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="clave">contraseña nueva</label>
+          <input id="clave" type="password" autocomplete="new-password" minlength="10" required />
+        </div>
+        <div class="campo">
+          <label for="clave2">repítela</label>
+          <input id="clave2" type="password" autocomplete="new-password" minlength="10" required />
+        </div>
+      </div>
+      <p class="mensaje" data-mensaje hidden></p>
+      <div class="acciones">
+        <button class="boton" type="submit">guardar contraseña</button>
+      </div>
+    </form>
+  </div>
+</Panel>
+
+<script>
+  import { datos } from '../scripts/panel/datos';
+  import { $, $$, avisar, ocupado } from '../scripts/panel/ui';
+
+  const d = await datos();
+  const mostrar = (paso: string) => $$('[data-paso]').forEach((p) => (p.hidden = p.dataset.paso !== paso));
+
+  const q = new URLSearchParams(location.search);
+  const token = q.get('token_hash');
+  let error = '';
+  if (token && q.get('type') === 'recovery') {
+    try {
+      await d.abrirEnlace(token, 'recovery');
+    } catch (e) {
+      error = (e as Error).message;
+    }
+    history.replaceState(null, '', '/restablecer');
+  }
+
+  if (!(await d.sesion())) {
+    $('[data-motivo]').textContent = error || 'Para cambiar tu contraseña, abre el enlace del correo que te mandamos.';
+    mostrar('invalido');
+  } else {
+    mostrar('formulario');
+    const form = $<HTMLFormElement>('[data-paso=formulario]');
+    const mensaje = $('[data-mensaje]', form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const clave = $<HTMLInputElement>('#clave').value;
+      if (clave.length < 10) return avisar(mensaje, 'La contraseña debe tener al menos 10 caracteres.');
+      if (clave !== $<HTMLInputElement>('#clave2').value) return avisar(mensaje, 'Las dos contraseñas no coinciden.');
+      ocupado($<HTMLButtonElement>('[type=submit]', form), async () => {
+        await d.cambiarClave(clave);
+        location.replace((await d.esAdmin()) ? '/admin' : '/panel');
+      }, mensaje);
+    });
+  }
+</script>
+
+<style>
+  .restablecer {
+    max-width: 640px;
+  }
+</style>

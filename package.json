@@ -1,0 +1,25 @@
+{
+  "name": "musicmafia-web",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Vitrina de beats para productores invitados. Astro estático; panel de productores y administración.",
+  "author": "Juan Pablo Velandia Molina (https://github.com/juanvelandiamolina)",
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "dev": "astro dev",
+    "dev:ensayo": "astro dev --mode ensayo --port 4322",
+    "build": "astro build",
+    "preview": "astro preview",
+    "demo": "node scripts/genera-demo.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/ballet": "^5.3.0",
+    "@supabase/supabase-js": "^2.119.0",
+    "astro": "^7.4.11"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

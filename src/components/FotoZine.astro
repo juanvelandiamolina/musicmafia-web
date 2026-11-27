@@ -1,0 +1,93 @@
+---
+// Foto de productor tratada como fotocopia (blanco y negro + grano) con estrellas rojas pegadas encima.
+// Las estrellas van por fuera de la imagen para que el filtro de grises no les quite el rojo.
+import Estrella from './Estrella.astro';
+
+interface Props {
+  /** Sin foto (es opcional para el productor) se muestra su inicial en grande. */
+  src: string | null;
+  /** Nombre del productor: de aquí sale la inicial cuando no hay foto. */
+  nombre?: string;
+  alt?: string;
+  semilla: string;
+  estrellas?: number;
+  class?: string;
+  ancho?: number;
+  alto?: number;
+  carga?: 'lazy' | 'eager';
+}
+const { src, nombre = '', alt = '', semilla, estrellas = 1, class: clase, ancho = 800, alto = 800, carga = 'lazy' } = Astro.props;
+const inicial = (nombre.trim()[0] ?? '·').toLowerCase();
+
+let h = 2166136261;
+for (const c of semilla) {
+  h ^= c.charCodeAt(0);
+  h = Math.imul(h, 16777619);
+}
+let s = h >>> 0 || 1;
+const R = () => {
+  s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0;
+  return s / 4294967296;
+};
+// La primera estrella cae cerca de la cara; las demás, alrededor y más pequeñas.
+const pegatinas = Array.from({ length: estrellas }, (_, i) => ({
+  izquierda: i === 0 ? 30 + R() * 30 : 15 + R() * 65,
+  arriba: i === 0 ? 22 + R() * 22 : 12 + R() * 60,
+  tam: i === 0 ? 20 + R() * 8 : 9 + R() * 7,
+  giro: Math.round(R() * 90 - 45),
+}));
+---
+<span class:list={['foto-zine', clase, { 'foto-zine--sin-foto': !src }]}>
+  {src ? (
+    <img src={src} alt={alt} width={ancho} height={alto} loading={carga} />
+  ) : (
+    <span class="foto-zine__inicial" role={alt ? 'img' : undefined} aria-label={alt || undefined} aria-hidden={alt ? undefined : 'true'}>{inicial}</span>
+  )}
+  {pegatinas.map((p, i) => (
+    <span class="pegatina" style={`left:${p.izquierda.toFixed(1)}%;top:${p.arriba.toFixed(1)}%;width:${p.tam.toFixed(1)}%;transform:translate(-50%,-50%) rotate(${p.giro}deg)`}>
+      <Estrella semilla={`${semilla}-${i}`} />
+    </span>
+  ))}
+</span>
+
+<style>
+  .foto-zine {
+    display: block;
+  }
+
+  /* Sin foto: la inicial del nombre, enorme y recortada, sobre negro con grano. */
+  .foto-zine--sin-foto {
+    aspect-ratio: 1;
+  }
+
+  .foto-zine__inicial {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--blanco);
+    font-size: clamp(8rem, 42cqw, 22rem);
+    font-weight: 900;
+    font-stretch: 75%;
+    line-height: 0.8;
+    letter-spacing: -0.08em;
+  }
+
+  .foto-zine--sin-foto {
+    container-type: inline-size;
+  }
+
+  .pegatina {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    aspect-ratio: 1;
+    color: var(--marca);
+    pointer-events: none;
+  }
+
+  .pegatina :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+</style>

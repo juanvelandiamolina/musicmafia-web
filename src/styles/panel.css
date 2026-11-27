@@ -1,0 +1,460 @@
+/* Panel de productores y administración: hojas de papel sobre el rojo, campos de imprenta. */
+
+body.cuerpo-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ---------- Hojas ---------- */
+.hoja {
+  position: relative;
+  padding: clamp(20px, 3.5vw, 36px);
+  background: var(--hoja);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+}
+
+.hoja + .hoja {
+  margin-top: 28px;
+}
+
+.hoja__titulo {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 900;
+  font-stretch: 85%;
+}
+
+.hoja__intro {
+  max-width: 60ch;
+  margin-top: 10px;
+  color: var(--texto-2);
+}
+
+/* ---------- Campos ---------- */
+.formulario {
+  display: grid;
+  gap: 20px;
+}
+
+.campo {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.campo > label,
+.campo__etiqueta,
+.grupo > legend {
+  font-size: var(--t-chica);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: lowercase;
+}
+
+.campo input:not([type='checkbox']):not([type='file']),
+.campo textarea,
+.campo select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 2px solid var(--negro);
+  border-radius: 0;
+  background: #f7f5f1;
+  color: var(--negro);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.campo textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.campo input:focus-visible,
+.campo textarea:focus-visible,
+.campo select:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 0;
+}
+
+.campo [aria-invalid='true'] {
+  border-color: var(--rojo-hondo);
+  box-shadow: inset 4px 0 0 var(--rojo-hondo);
+}
+
+.campo__pie {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--texto-2);
+  font-size: var(--t-micro);
+  font-weight: 600;
+}
+
+.campo__cuenta {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Campo con prefijo fijo: "@" de Instagram o el dominio del enlace. */
+.prefijo {
+  display: flex;
+  align-items: stretch;
+}
+
+.prefijo > span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 2px solid var(--negro);
+  border-right: 0;
+  background: var(--negro);
+  color: var(--claro);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.prefijo input {
+  min-width: 0;
+}
+
+.ayuda {
+  color: var(--texto-2);
+  font-size: var(--t-chica);
+  line-height: 1.45;
+}
+
+.fila-campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 20px;
+}
+
+/* ---------- Mensajes ---------- */
+.mensaje {
+  padding: 12px 14px;
+  border-left: 6px solid var(--negro);
+  background: var(--hoja-2);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.mensaje[data-tipo='error'] {
+  border-color: var(--rojo-hondo);
+  color: var(--rojo-hondo);
+}
+
+.mensaje[data-tipo='ok'] {
+  border-color: var(--negro);
+}
+
+.mensaje a {
+  font-weight: 800;
+  word-break: break-all;
+}
+
+/* ---------- Botones del panel ---------- */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.boton[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.boton[aria-busy='true'] {
+  cursor: progress;
+}
+
+.boton--peligro {
+  border-color: var(--rojo-hondo);
+  background: var(--rojo-hondo);
+  color: var(--blanco);
+}
+
+.boton--peligro:hover:not([disabled]) {
+  background: var(--blanco);
+  color: var(--rojo-hondo);
+}
+
+.boton--chico {
+  min-height: 40px;
+  padding: 6px 14px;
+  font-size: 0.9375rem;
+}
+
+.boton[data-armado] {
+  background: var(--rojo-hondo);
+  border-color: var(--rojo-hondo);
+  color: var(--blanco);
+}
+
+.enlace-boton {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+/* Selector de archivo con aspecto de botón; el input real queda accesible pero invisible. */
+.archivo {
+  position: relative;
+  overflow: hidden;
+}
+
+.archivo input[type='file'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.archivo:focus-within {
+  outline: 3px solid var(--acento);
+  outline-offset: 3px;
+}
+
+/* ---------- Casillas de aceptación ---------- */
+.casillas-aceptar {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 18px 20px;
+  border: 2px dashed var(--negro);
+  background: var(--hoja-2);
+  list-style: none;
+}
+
+.casillas-aceptar label {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 12px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.casillas-aceptar input,
+.interruptor input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--negro);
+}
+
+.casillas-aceptar small {
+  display: block;
+  margin-top: 2px;
+  color: var(--texto-2);
+  font-size: var(--t-micro);
+  font-weight: 700;
+}
+
+.interruptor {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 12px;
+  max-width: 60ch;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* ---------- Estilos (hasta tres) ---------- */
+.grupo {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chip {
+  position: relative;
+}
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+}
+
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 2px solid var(--negro);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+.chip input:checked + span {
+  background: var(--negro);
+  color: var(--claro);
+}
+
+.chip input:focus-visible + span {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.chip input:disabled + span {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- Colores (muestras para elegir) ---------- */
+.colores-elegir {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.color-muestra {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  font-size: var(--t-micro);
+  font-weight: 700;
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+.color-muestra input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+}
+
+.color-muestra__mancha {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--negro);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.color-muestra input:checked + .color-muestra__mancha {
+  outline: 3px solid var(--negro);
+  outline-offset: 3px;
+}
+
+.color-muestra input:checked + .color-muestra__mancha::after {
+  content: '✓';
+}
+
+.color-muestra input:focus-visible + .color-muestra__mancha {
+  outline: 3px solid var(--acento);
+  outline-offset: 3px;
+}
+
+/* ---------- Pestañas ---------- */
+.pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 36px 0 0;
+  border-bottom: 2px solid var(--negro);
+}
+
+.pestanas button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  margin-bottom: -2px;
+  padding: 8px 20px;
+  border: 2px solid var(--negro);
+  border-left-width: 0;
+  background: transparent;
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  cursor: pointer;
+}
+
+.pestanas button:first-child {
+  border-left-width: 2px;
+}
+
+.pestanas button[aria-selected='true'] {
+  border-bottom-color: var(--hoja);
+  background: var(--hoja);
+}
+
+.pestanas .contador-pestana {
+  font-size: var(--t-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.pestanas + .hoja {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+}
+
+/* ---------- Carga ---------- */
+.cargando {
+  padding: 40px 0;
+  font-size: var(--t-entrada);
+  font-weight: 700;
+}
+
+.vacio-panel {
+  padding: 24px 0 8px;
+  color: var(--texto-2);
+  font-weight: 600;
+}
+
+/* ---------- Barra de progreso de subida ---------- */
+.progreso {
+  display: grid;
+  gap: 6px;
+  font-size: var(--t-chica);
+  font-weight: 700;
+}
+
+.progreso__barra {
+  height: 10px;
+  border: 2px solid var(--negro);
+  background: var(--hoja-2);
+}
+
+.progreso__barra span {
+  display: block;
+  height: 100%;
+  width: calc(var(--avance, 0) * 100%);
+  background: var(--rojo);
+  transition: width 160ms ease;
+}
+
+/* ---------- Zona de peligro ---------- */
+.peligro {
+  border: 2px solid var(--negro);
+  padding: 20px;
+}
+
+.peligro h3 {
+  color: var(--negro);
+}

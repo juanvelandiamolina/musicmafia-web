@@ -1,0 +1,140 @@
+---
+import { SITIO, gmail } from '../lib/sitio';
+
+const legales = [
+  { href: '/privacidad', texto: 'política de privacidad' },
+  { href: '/terminos', texto: 'términos y condiciones' },
+  { href: '/tratamiento-de-datos', texto: 'tratamiento de datos personales' },
+  { href: '/cookies', texto: 'cookies' },
+];
+const anio = new Date().getFullYear();
+---
+<footer class="pie">
+  <div class="pie__rejilla contenedor">
+    <p class="pie__lema">un círculo cerrado de productores. se entra solo por invitación.</p>
+
+    <div>
+      <h2 class="pie__titulo">contacto</h2>
+      <ul class="pie__lista">
+        <li><a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a></li>
+        <li><a href={SITIO.contacto.telefonoHref}>{SITIO.contacto.telefono}</a></li>
+        <li>{SITIO.contacto.ciudad.toLowerCase()}</li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="pie__titulo">legal</h2>
+      <ul class="pie__lista">
+        {legales.map((l) => <li><a href={l.href}>{l.texto}</a></li>)}
+        <li><button type="button" class="pie__boton" data-abrir-cookies>preferencias de cookies</button></li>
+        <li><a href="/ingresar">acceso de productores</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="pie__marca contenedor" aria-hidden="true">musicmafia</p>
+  <p class="pie__final contenedor"><span>© {anio} musicmafia</span><span>hecho en bogotá</span></p>
+</footer>
+
+<style>
+  .pie {
+    margin-top: auto;
+    padding: 56px 0 24px;
+    overflow: hidden;
+    background: var(--negro);
+    color: var(--claro);
+    font-size: var(--t-chica);
+    line-height: 1.6;
+  }
+
+  .pie__rejilla {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 32px;
+  }
+
+  .pie__lema {
+    max-width: 22ch;
+    font-size: 1.375rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+  }
+
+  .pie__titulo {
+    margin-bottom: 10px;
+    color: var(--acento);
+    font-size: var(--t-chica);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .pie__lista {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pie__lista a,
+  .pie__boton {
+    color: var(--claro);
+    text-decoration: none;
+  }
+
+  .pie__lista a:hover,
+  .pie__boton:hover {
+    color: var(--acento);
+    text-decoration: underline;
+  }
+
+  .pie__boton {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: inherit;
+    line-height: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .pie :global(:focus-visible) {
+    outline-color: var(--claro);
+  }
+
+  /* La marca enorme, de borde a borde, como el pie de un póster. */
+  .pie__marca {
+    margin-top: 48px;
+    color: var(--acento);
+    font-size: clamp(4rem, 19.5vw, 19rem);
+    font-weight: 900;
+    font-stretch: 85%;
+    line-height: 0.8;
+    letter-spacing: -0.07em;
+    white-space: nowrap;
+  }
+
+  .pie__final {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    color: var(--gris-noche);
+    font-size: var(--t-micro);
+  }
+
+  @media (max-width: 760px) {
+    .pie__rejilla {
+      grid-template-columns: 1fr 1fr;
+    }
+    .pie__lema {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .pie__rejilla {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

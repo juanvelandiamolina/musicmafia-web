@@ -1,0 +1,215 @@
+---
+// Plantilla de los documentos legales: título, versión y vigencia, índice opcional y datos del responsable al final.
+import Base from './Base.astro';
+import { SITIO, gmail } from '../lib/sitio';
+import { LEGAL, fechaLarga, RESPONSABLE_TEXTO } from '../lib/legal';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  indice?: { id: string; titulo: string }[];
+}
+const { titulo, descripcion, indice } = Astro.props;
+---
+<Base titulo={titulo} descripcion={descripcion} seccion="otra">
+  <article class="legal contenedor">
+    <header class="legal__cabecera">
+      <h1>{titulo}</h1>
+      <p class="legal__version">Versión {LEGAL.version}, vigente desde el {fechaLarga(LEGAL.vigenteDesde)}.</p>
+    </header>
+
+    {indice && (
+      <nav class="legal__indice" aria-label="Secciones de este documento">
+        <ol>
+          {indice.map((s) => <li><a href={`#${s.id}`}>{s.titulo}</a></li>)}
+        </ol>
+      </nav>
+    )}
+
+    <div class="legal__cuerpo">
+      <slot />
+    </div>
+
+    <footer class="legal__responsable">
+      <h2>Responsable</h2>
+      <p>
+        {RESPONSABLE_TEXTO}, con domicilio en {SITIO.responsable.direccion}.<br />
+        Correo: <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a>. Teléfono:{' '}
+        <a href={SITIO.contacto.telefonoHref}>{SITIO.contacto.telefono}</a>.
+      </p>
+      <p class="legal__otros">
+        Otros documentos:{' '}
+        <a href="/privacidad">Política de privacidad</a>,{' '}
+        <a href="/tratamiento-de-datos">Tratamiento de datos personales</a>,{' '}
+        <a href="/terminos">Términos y condiciones</a> y{' '}
+        <a href="/cookies">Cookies</a>.
+      </p>
+    </footer>
+  </article>
+</Base>
+
+<style>
+  /* El documento es una hoja de papel pegada sobre el rojo. */
+  .legal {
+    max-width: calc(880px + 2 * var(--margen));
+    padding-top: clamp(40px, 7vw, 88px);
+    padding-bottom: clamp(72px, 10vw, 120px);
+  }
+
+  .legal__cabecera h1 {
+    font-size: clamp(3rem, 9vw, 7rem);
+    font-weight: 900;
+    font-stretch: 82%;
+    line-height: 0.85;
+    letter-spacing: -0.065em;
+    text-transform: lowercase;
+  }
+
+  .legal__version {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 2px solid var(--negro);
+    font-size: var(--t-chica);
+    font-weight: 700;
+  }
+
+  .legal__indice {
+    margin-top: 32px;
+    padding: 18px 24px;
+    background: var(--negro);
+    color: var(--claro);
+    --foco: var(--claro);
+  }
+
+  .legal__indice ol {
+    columns: 2;
+    column-gap: 32px;
+    margin: 0;
+    padding-left: 1.6em;
+    font-size: var(--t-chica);
+    font-weight: 600;
+    line-height: 1.9;
+  }
+
+  .legal__indice li::marker {
+    color: var(--acento);
+  }
+
+  .legal__indice a {
+    color: var(--claro);
+    text-decoration: none;
+  }
+
+  .legal__indice a:hover {
+    color: var(--acento);
+    text-decoration: underline;
+  }
+
+  .legal__cuerpo {
+    margin-top: 32px;
+    padding: clamp(24px, 4vw, 48px);
+    background: var(--hoja);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+    font-size: var(--t-cuerpo);
+    line-height: 1.6;
+  }
+
+  .legal__cuerpo > :global(:first-child) {
+    margin-top: 0;
+  }
+
+  .legal__cuerpo :global(h2) {
+    margin-top: 52px;
+    font-size: clamp(1.625rem, 3vw, 2.125rem);
+    font-weight: 900;
+    font-stretch: 88%;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    scroll-margin-top: calc(var(--nav-alto) + 24px);
+  }
+
+  .legal__cuerpo :global(h3) {
+    margin-top: 28px;
+    font-size: 1.25rem;
+    letter-spacing: -0.03em;
+  }
+
+  .legal__cuerpo :global(p),
+  .legal__cuerpo :global(ul),
+  .legal__cuerpo :global(ol) {
+    max-width: 68ch;
+    margin: 14px 0 0;
+  }
+
+  .legal__cuerpo :global(li) {
+    margin-top: 6px;
+  }
+
+  .legal__cuerpo :global(li::marker) {
+    color: var(--negro);
+  }
+
+  .legal__cuerpo :global(a) {
+    color: var(--negro);
+    font-weight: 600;
+  }
+
+  .legal__cuerpo :global(.resumen) {
+    margin-top: 32px;
+    padding: 22px 26px;
+    border: 2px solid var(--negro);
+    background: var(--hoja-2);
+  }
+
+  .legal__cuerpo :global(.resumen a) {
+    color: var(--negro);
+  }
+
+  .legal__cuerpo :global(.resumen li::marker) {
+    color: var(--negro);
+  }
+
+  .legal__cuerpo > :global(.resumen:first-child) {
+    margin-top: 0;
+  }
+
+  .legal__cuerpo :global(.resumen h2) {
+    margin-top: 0;
+    font-size: 1.5rem;
+  }
+
+  .legal__cuerpo :global(.resumen ul) {
+    padding-left: 1.2em;
+  }
+
+  .legal__responsable {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 2px solid var(--negro);
+    font-size: var(--t-chica);
+  }
+
+  .legal__responsable h2 {
+    font-size: var(--t-chica);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .legal__responsable p {
+    margin-top: 6px;
+  }
+
+  .legal__responsable a {
+    font-weight: 700;
+  }
+
+  .legal__otros {
+    margin-top: 14px !important;
+  }
+
+  @media (max-width: 640px) {
+    .legal__indice ol {
+      columns: 1;
+    }
+  }
+</style>

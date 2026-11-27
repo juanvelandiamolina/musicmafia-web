@@ -1,0 +1,9 @@
+# MusicMafia: la web pública se puede indexar; las páginas de acceso y los paneles, no.
+User-agent: *
+Disallow: /ingresar
+Disallow: /bienvenida
+Disallow: /restablecer
+Disallow: /panel
+Disallow: /admin
+Disallow: /api/
+Disallow: /demo/

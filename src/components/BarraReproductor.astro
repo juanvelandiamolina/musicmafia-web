@@ -1,0 +1,202 @@
+---
+// Barra flotante con el beat que suena. Aparece al tocar el primer beat; la maneja src/scripts/reproductor.ts.
+import Icono from './Icono.astro';
+---
+<section class="barra" data-barra hidden aria-label="Reproductor">
+  <div class="barra__progreso" data-b-progreso role="slider" tabindex="0" aria-label="Posición en el beat" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00">
+    <span class="barra__pista"><span class="barra__relleno"></span></span>
+  </div>
+  <div class="barra__fila">
+    <img class="barra__portada" data-b-portada src="data:," alt="" width="600" height="600" />
+    <div class="barra__titulos">
+      <p class="barra__titulo" data-b-titulo></p>
+      <p class="barra__autor" data-b-autor></p>
+    </div>
+    <div class="barra__controles">
+      <button type="button" class="barra__boton barra__boton--extra" data-b-anterior aria-label="Beat anterior"><Icono nombre="anterior" /></button>
+      <button type="button" class="barra__boton" data-b-atras aria-label="Retroceder 10 segundos"><Icono nombre="atras10" /></button>
+      <button type="button" class="barra__boton barra__boton--tocar" data-b-tocar aria-label="Reproducir">
+        <Icono nombre="tocar" class="si-pausa" /><Icono nombre="pausa" class="si-sonando" />
+      </button>
+      <button type="button" class="barra__boton" data-b-adelante aria-label="Adelantar 10 segundos"><Icono nombre="adelante10" /></button>
+      <button type="button" class="barra__boton barra__boton--extra" data-b-siguiente aria-label="Beat siguiente"><Icono nombre="siguiente" /></button>
+    </div>
+    <p class="barra__tiempo"><span data-b-actual>0:00</span><span aria-hidden="true"> / </span><span data-b-total>0:00</span></p>
+  </div>
+</section>
+
+<style>
+  .barra {
+    --foco: var(--claro);
+    position: fixed;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 50%;
+    z-index: 60;
+    width: min(1000px, calc(100% - 24px));
+    background: var(--negro);
+    color: var(--claro);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+    transform: translateX(-50%);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .barra:not([hidden]) {
+      animation: barra-entra 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+  }
+
+  @keyframes barra-entra {
+    from { opacity: 0; transform: translate(-50%, 16px); }
+  }
+
+  /* Progreso: una línea roja en el borde de arriba, con zona de toque más alta. */
+  .barra__progreso {
+    position: absolute;
+    top: -7px;
+    left: 0;
+    right: 0;
+    height: 16px;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .barra__pista {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 5px;
+    overflow: hidden;
+    background: #3a3836;
+  }
+
+  .barra__relleno {
+    position: absolute;
+    inset: 0;
+    background: var(--marca);
+    transform: scaleX(var(--p, 0));
+    transform-origin: left;
+  }
+
+  .barra__progreso:focus-visible {
+    outline-offset: 0;
+  }
+
+  .barra__fila {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px 12px 12px;
+  }
+
+  .barra__portada {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+  }
+
+  .barra__titulo {
+    overflow: hidden;
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-transform: lowercase;
+  }
+
+  .barra__autor {
+    overflow: hidden;
+    color: var(--marca);
+    font-size: var(--t-chica);
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-transform: lowercase;
+  }
+
+  .barra__controles {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .barra__boton {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--claro);
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: color 140ms ease, transform 140ms ease;
+  }
+
+  .barra__boton:hover {
+    color: var(--marca);
+  }
+
+  .barra__boton:active {
+    transform: scale(0.92);
+  }
+
+  .barra__boton--tocar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--marca);
+    color: var(--negro);
+    font-size: 1.1rem;
+  }
+
+  .barra__boton--tocar:hover {
+    background: var(--claro);
+    color: var(--negro);
+  }
+
+  .barra__boton--tocar :global(.si-sonando),
+  .barra__boton--tocar[data-estado='sonando'] :global(.si-pausa) {
+    display: none;
+  }
+
+  .barra__boton--tocar[data-estado='sonando'] :global(.si-sonando) {
+    display: block;
+  }
+
+  .barra__tiempo {
+    min-width: 92px;
+    color: var(--gris-noche);
+    font-size: var(--t-chica);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    .barra__fila {
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      gap: 10px;
+      padding: 10px 8px 10px 10px;
+    }
+    .barra__portada {
+      width: 44px;
+      height: 44px;
+    }
+    .barra__boton--extra,
+    .barra__tiempo {
+      display: none;
+    }
+    .barra__boton {
+      width: 40px;
+      height: 40px;
+    }
+    .barra__boton--tocar {
+      width: 46px;
+      height: 46px;
+    }
+  }
+</style>

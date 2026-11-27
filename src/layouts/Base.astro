@@ -1,0 +1,90 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/ballet/opsz.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Pie from '../components/Pie.astro';
+import AvisoCookies from '../components/AvisoCookies.astro';
+import { SITIO } from '../lib/sitio';
+import { ES_DEMO } from '../data/catalogo';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+  /** Imagen para la vista previa al compartir el enlace (WhatsApp, Instagram, etc.). */
+  imagen?: string;
+  seccion?: 'inicio' | 'productores' | 'otra';
+  /** Color de un productor (#rrggbb): convierte la página en su perfil (fondo de su color, hojas blancas). */
+  color?: string;
+}
+const { titulo, descripcion = SITIO.descripcion, imagen, seccion, color } = Astro.props;
+const tituloCompleto = titulo ? `${titulo} | MusicMafia` : 'MusicMafia';
+const canonica = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonica} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content={color ?? '#f7f6f2'} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MusicMafia" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonica} />
+    {imagen && <meta property="og:image" content={new URL(imagen, Astro.site)} />}
+    <meta name="twitter:card" content={imagen ? 'summary_large_image' : 'summary'} />
+    {ES_DEMO && <meta name="robots" content="noindex, nofollow" />}
+  </head>
+  <body class:list={{ 'tema-productor': Boolean(color) }} style={color ? `--marca: ${color}` : undefined}>
+    <a class="saltar" href="#contenido">saltar al contenido</a>
+    {ES_DEMO && <p class="aviso-demo">prototipo con datos de ejemplo: productores, fotos y beats son ficticios</p>}
+    <Nav seccion={seccion} />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Pie />
+    <slot name="final" />
+    <AvisoCookies />
+  </body>
+</html>
+
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .saltar {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 300;
+    padding: 10px 16px;
+    background: var(--negro);
+    color: var(--claro);
+    font-weight: 700;
+    text-decoration: none;
+    transform: translateY(-200%);
+  }
+
+  .saltar:focus-visible {
+    transform: none;
+  }
+
+  .aviso-demo {
+    padding: 6px var(--margen);
+    background: var(--negro);
+    color: var(--claro);
+    font-size: var(--t-micro);
+    font-weight: 600;
+    text-align: center;
+  }
+</style>

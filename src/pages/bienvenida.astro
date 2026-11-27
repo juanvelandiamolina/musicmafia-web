@@ -1,0 +1,168 @@
+---
+// Activación de la cuenta: aquí llega el enlace del correo de invitación (?token_hash=…&type=invite).
+// El productor elige su contraseña y acepta las condiciones; cada aceptación queda con fecha, versión e IP.
+import Panel from '../layouts/Panel.astro';
+import CasillasAceptar from '../components/CasillasAceptar.astro';
+import { SITIO, gmail } from '../lib/sitio';
+---
+<Panel titulo="Activa tu cuenta" zona="acceso">
+  <div class="bienvenida">
+    <p class="cargando" data-paso="verificando">abriendo tu invitación…</p>
+
+    <div class="hoja" data-paso="invalido" hidden>
+      <h1 class="hoja__titulo">este enlace no sirve.</h1>
+      <p class="hoja__intro" data-motivo></p>
+      <p class="hoja__intro">
+        Los enlaces de invitación funcionan una sola vez y vencen en 24 horas. Escríbenos a{' '}
+        <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a> y te mandamos otro. Si ya activaste tu
+        cuenta, <a href="/ingresar">entra aquí</a>.
+      </p>
+    </div>
+
+    <form class="formulario" data-paso="formulario" hidden novalidate>
+      <header class="bienvenida__cabecera">
+        <p class="guion bienvenida__guion" aria-hidden="true">adelante</p>
+        <h1 class="bienvenida__titulo">hola, <span data-nombre></span>.</h1>
+        <p class="bienvenida__enlace" data-con-enlace hidden>
+          Tu perfil vivirá en <strong>{SITIO.dominio}/<span data-enlace></span></strong>
+        </p>
+      </header>
+
+      <section class="hoja formulario">
+        <h2 class="hoja__titulo">tu contraseña</h2>
+        <p class="ayuda">Al menos 10 caracteres. Una frase que recuerdes es mejor que una palabra rara.</p>
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="clave">contraseña</label>
+            <input id="clave" type="password" autocomplete="new-password" minlength="10" required />
+          </div>
+          <div class="campo">
+            <label for="clave2">repítela</label>
+            <input id="clave2" type="password" autocomplete="new-password" minlength="10" required />
+          </div>
+        </div>
+      </section>
+
+      <section class="hoja formulario" data-con-casillas>
+        <h2 class="hoja__titulo">lo que aceptas</h2>
+        <CasillasAceptar />
+      </section>
+
+      <p class="mensaje" data-mensaje hidden></p>
+      <div class="acciones">
+        <button class="boton" type="submit">activar mi cuenta</button>
+      </div>
+    </form>
+  </div>
+</Panel>
+
+<script>
+  import { datos } from '../scripts/panel/datos';
+  import { $, $$, avisar, ocupado } from '../scripts/panel/ui';
+  import { LEGAL } from '../lib/legal';
+
+  const d = await datos();
+  const pasos = $$('[data-paso]');
+  const mostrar = (paso: string) => pasos.forEach((p) => (p.hidden = p.dataset.paso !== paso));
+  const invalido = (motivo: string) => {
+    $('[data-motivo]').textContent = motivo;
+    mostrar('invalido');
+  };
+
+  const q = new URLSearchParams(location.search);
+  const token = q.get('token_hash');
+  let error = '';
+  if (token && q.get('type') === 'invite') {
+    try {
+      await d.abrirEnlace(token, 'invite');
+    } catch (e) {
+      error = (e as Error).message;
+    }
+    history.replaceState(null, '', '/bienvenida');
+  }
+
+  const sesion = await d.sesion();
+  if (!sesion) {
+    invalido(error || 'Para activar tu cuenta, abre el enlace de tu correo de invitación.');
+  } else {
+    const [perfil, aceptaciones, admin] = await Promise.all([d.miPerfil(), d.misAceptaciones(), d.esAdmin()]);
+    const yaActiva = aceptaciones.some((a) => a.casilla === 'terminos' && a.aceptada);
+    if (yaActiva) location.replace(admin ? '/admin' : '/panel');
+
+    $('[data-nombre]').textContent = (perfil?.nombre || sesion.correo).toLowerCase();
+    if (perfil) {
+      $('[data-enlace]').textContent = perfil.enlace;
+      $('[data-con-enlace]').hidden = false;
+    } else {
+      $('[data-con-casillas]').hidden = true; // Una cuenta de MusicMafia no publica perfil.
+    }
+    mostrar('formulario');
+
+    const form = $<HTMLFormElement>('[data-paso=formulario]');
+    const mensaje = $('[data-mensaje]', form);
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const clave = $<HTMLInputElement>('#clave').value;
+      const repetida = $<HTMLInputElement>('#clave2').value;
+      $('#clave').setAttribute('aria-invalid', String(clave.length < 10));
+      $('#clave2').setAttribute('aria-invalid', String(clave !== repetida));
+      if (clave.length < 10) return avisar(mensaje, 'La contraseña debe tener al menos 10 caracteres.');
+      if (clave !== repetida) return avisar(mensaje, 'Las dos contraseñas no coinciden.');
+
+      const casillas = $$<HTMLInputElement>('input[name=casilla]', form);
+      if (perfil && casillas.some((c) => c.dataset.obligatoria !== undefined && !c.checked)) {
+        return avisar(mensaje, 'Para activar la cuenta tienes que marcar las cuatro casillas obligatorias.');
+      }
+      const novedades = casillas.find((c) => c.value === 'novedades')?.checked ?? false;
+
+      ocupado($<HTMLButtonElement>('[type=submit]', form), async () => {
+        try {
+          await d.cambiarClave(clave);
+        } catch (e) {
+          // Si ya la había puesto en un intento anterior, Supabase pide que sea distinta: se sigue igual.
+          if (!/distinta/.test((e as Error).message)) throw e;
+        }
+        if (perfil) await d.aceptarDocumentos(LEGAL.version, novedades);
+        location.replace(perfil ? '/panel' : '/admin');
+      }, mensaje);
+    });
+  }
+</script>
+
+<style>
+  .bienvenida {
+    display: grid;
+    gap: 28px;
+    max-width: 760px;
+  }
+
+  .bienvenida__cabecera {
+    position: relative;
+  }
+
+  .bienvenida__guion {
+    color: var(--hoja);
+    font-size: clamp(3rem, 8vw, 5rem);
+    transform: rotate(-6deg);
+    transform-origin: left bottom;
+  }
+
+  .bienvenida__titulo {
+    margin-top: 4px;
+    font-size: clamp(3rem, 9vw, 6rem);
+    font-weight: 900;
+    font-stretch: 82%;
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+  }
+
+  .bienvenida__enlace {
+    margin-top: 16px;
+    font-size: var(--t-entrada);
+    font-weight: 600;
+  }
+
+  .hoja + .hoja {
+    margin-top: 0;
+  }
+</style>

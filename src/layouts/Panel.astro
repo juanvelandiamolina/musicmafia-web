@@ -1,0 +1,193 @@
+---
+// Marco de las páginas privadas (entrar, activar cuenta, panel del productor y administración).
+// No se indexan, no cargan la medición de visitas y solo guardan en el navegador la sesión (esencial).
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/ballet/opsz.css';
+import '../styles/global.css';
+import '../styles/panel.css';
+import Logo from '../components/Logo.astro';
+import { HAY_SUPABASE } from '../lib/conexion';
+import { SITIO, gmail } from '../lib/sitio';
+
+interface Props {
+  titulo: string;
+  zona: 'acceso' | 'panel' | 'admin';
+}
+const { titulo, zona } = Astro.props;
+const nombreZona = { acceso: 'acceso', panel: 'tu panel', admin: 'administración' }[zona];
+---
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titulo} | MusicMafia</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#f7f6f2" />
+  </head>
+  <body class="cuerpo-panel" data-zona={zona}>
+    <a class="saltar" href="#contenido">saltar al contenido</a>
+    {!HAY_SUPABASE && (
+      <p class="aviso-ensayo">
+        modo de ensayo: todo se guarda solo en este navegador y nada se publica. al conectar supabase, este aviso desaparece.
+      </p>
+    )}
+    <header class="barra-panel">
+      <div class="barra-panel__interior contenedor">
+        <a class="barra-panel__marca" href="/">
+          <Logo class="barra-panel__logo" title="" />
+          <span>musicmafia</span>
+        </a>
+        <span class="barra-panel__zona guion" aria-hidden="true">{nombreZona}</span>
+        <nav class="barra-panel__acciones" aria-label="Cuenta" data-acciones hidden>
+          <a href="/panel" data-ir-panel hidden>tu panel</a>
+          <a href="/admin" data-ir-admin hidden>administración</a>
+          <a href="/" data-ver-perfil hidden target="_blank" rel="noopener">ver mi perfil</a>
+          <button type="button" data-salir>salir</button>
+        </nav>
+      </div>
+    </header>
+    <main id="contenido" class="contenido-panel contenedor">
+      <slot />
+    </main>
+    <footer class="pie-panel contenedor">
+      <span>© {new Date().getFullYear()} {SITIO.nombre}</span>
+      <a href="/terminos">términos</a>
+      <a href="/tratamiento-de-datos">tratamiento de datos</a>
+      <a href="/privacidad">privacidad</a>
+      <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a>
+    </footer>
+  </body>
+</html>
+
+<script>
+  import { datos } from '../scripts/panel/datos';
+
+  // Barra superior: enlaces según quién tiene la sesión, y "salir".
+  const acciones = document.querySelector<HTMLElement>('[data-acciones]')!;
+  const zona = document.body.dataset.zona;
+  datos().then(async (d) => {
+    const s = await d.sesion();
+    if (!s || zona === 'acceso') return;
+    acciones.hidden = false;
+    const admin = await d.esAdmin().catch(() => false);
+    acciones.querySelector<HTMLElement>('[data-ir-admin]')!.hidden = !admin || zona === 'admin';
+    acciones.querySelector<HTMLElement>('[data-ir-panel]')!.hidden = admin || zona === 'panel';
+    acciones.querySelector('[data-salir]')!.addEventListener('click', async () => {
+      await d.salir();
+      location.replace('/ingresar');
+    });
+  });
+</script>
+
+<style>
+  .saltar {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 300;
+    padding: 10px 16px;
+    background: var(--negro);
+    color: var(--claro);
+    font-weight: 700;
+    text-decoration: none;
+    transform: translateY(-200%);
+  }
+
+  .saltar:focus-visible {
+    transform: none;
+  }
+
+  .aviso-ensayo {
+    padding: 6px var(--margen);
+    background: var(--negro);
+    color: var(--claro);
+    font-size: var(--t-micro);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .barra-panel {
+    border-bottom: 2px solid var(--negro);
+  }
+
+  .barra-panel__interior {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: var(--nav-alto);
+  }
+
+  .barra-panel__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    text-decoration: none;
+  }
+
+  .barra-panel__marca :global(.barra-panel__logo) {
+    width: auto;
+    height: 32px;
+  }
+
+  .barra-panel__zona {
+    color: var(--hoja);
+    font-size: 1.75rem;
+    transform: rotate(-4deg) translateY(2px);
+  }
+
+  .barra-panel__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 18px;
+    margin-left: auto;
+    font-weight: 700;
+  }
+
+  .barra-panel__acciones a,
+  .barra-panel__acciones button {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .barra-panel__acciones a:hover,
+  .barra-panel__acciones button:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+
+  .contenido-panel {
+    flex: 1;
+    padding-top: clamp(28px, 5vw, 56px);
+    padding-bottom: clamp(56px, 8vw, 96px);
+  }
+
+  .pie-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    padding-top: 18px;
+    padding-bottom: 28px;
+    border-top: 2px solid var(--negro);
+    font-size: var(--t-chica);
+    font-weight: 600;
+  }
+
+  @media (max-width: 560px) {
+    .barra-panel__zona {
+      display: none;
+    }
+  }
+</style>

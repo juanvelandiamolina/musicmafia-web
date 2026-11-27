@@ -1,0 +1,207 @@
+---
+import Base from '../layouts/Base.astro';
+import Estrella from '../components/Estrella.astro';
+import FotoZine from '../components/FotoZine.astro';
+import { productores } from '../data/catalogo';
+
+const lista = productores();
+---
+<Base titulo="Productores" descripcion="Los productores de MusicMafia. Entra a un perfil para escuchar sus beats." seccion="productores">
+  <div class="contenedor">
+    <header class="cabecera">
+      <h1>productores</h1>
+      <p class="cabecera__linea repartido">
+        <span>elegidos uno por uno</span>{' '}<span>sin inscripción</span>{' '}<span>entra y escucha</span>
+      </p>
+    </header>
+
+    {lista.length === 0 && (
+      <p class="vacio">
+        <span class="vacio__guion guion" aria-hidden="true">pronto</span>
+        Los primeros perfiles se están preparando. Vuelve en unos días.
+      </p>
+    )}
+
+    <ul class="rejilla">
+      {lista.map((p) => (
+        <li style={`--marca: ${p.color}`}>
+          <a class="ficha con-viraje" href={`/${p.slug}`}>
+            <span class="ficha__marco">
+              <FotoZine src={p.foto} nombre={p.nombre} semilla={p.slug} class="ficha__foto" estrellas={2} />
+              <span class="ficha__sello">
+                <Estrella semilla={`numero-${p.slug}`} />
+                <span class="ficha__sello-texto"><small>desde</small>{' '}{p.desde}</span>
+              </span>
+            </span>
+            <span class="ficha__nombre">{p.nombre.toLowerCase()}</span>
+            {p.ciudad && <span class="ficha__ciudad">{p.ciudad.toLowerCase()}</span>}
+            <span class="ficha__abrebocas">{p.abrebocas}</span>
+            <span class="etiquetas" aria-label="Estilos principales">
+              {p.tags.map((t) => <span class="etiqueta">{t.nombre}</span>)}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .cabecera {
+    padding: clamp(40px, 7vw, 88px) 0 clamp(36px, 5vw, 64px);
+  }
+
+  .cabecera h1 {
+    font-size: clamp(3.5rem, 15vw, 14rem);
+    font-weight: 900;
+    font-stretch: 80%;
+    line-height: 0.8;
+    letter-spacing: -0.07em;
+    /* Con el interlineado tan apretado, la «p» baja más que la caja del título: este relleno le deja sitio
+       para que no choque con la raya de abajo. */
+    padding-bottom: 0.18em;
+  }
+
+  .cabecera__linea {
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 2px solid var(--negro);
+    font-size: var(--t-entrada);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .rejilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: clamp(28px, 4vw, 48px) clamp(20px, 3vw, 36px);
+    margin: 0 0 clamp(80px, 10vw, 128px);
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Cada ficha es papel pegado sobre el rojo, un poco torcido. */
+  .ficha {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 12px 12px 22px;
+    background: var(--marca);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+    text-decoration: none;
+    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .rejilla li:nth-child(3n + 1) .ficha { transform: rotate(-1.2deg); }
+  .rejilla li:nth-child(3n + 2) .ficha { transform: rotate(0.8deg) translateY(12px); }
+  .rejilla li:nth-child(3n) .ficha { transform: rotate(-0.4deg); }
+
+  .rejilla li .ficha:hover,
+  .rejilla li .ficha:focus-visible {
+    transform: rotate(0) translateY(-4px);
+  }
+
+  .ficha__marco {
+    position: relative;
+    display: block;
+  }
+
+  .ficha__marco :global(.ficha__foto) {
+    aspect-ratio: 4 / 5;
+  }
+
+  .vacio {
+    display: grid;
+    gap: 8px;
+    max-width: 36ch;
+    margin: 0 0 clamp(80px, 10vw, 128px);
+    font-size: var(--t-entrada);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .vacio__guion {
+    color: var(--hoja);
+    font-size: clamp(4rem, 12vw, 8rem);
+    line-height: 1;
+    transform: rotate(-6deg);
+    transform-origin: left center;
+  }
+
+  /* Sello con el año de entrada: una estrella-pegatina en la esquina de la foto. */
+  .ficha__sello {
+    position: absolute;
+    top: -26px;
+    right: -22px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 82px;
+    height: 82px;
+    color: var(--marca);
+    transform: rotate(8deg);
+  }
+
+  .ficha__sello :global(svg) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .ficha__sello-texto {
+    position: relative;
+    display: grid;
+    color: var(--negro);
+    font-size: 0.9375rem;
+    font-weight: 900;
+    font-stretch: 80%;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    text-align: center;
+  }
+
+  .ficha__sello-texto small {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .ficha__nombre {
+    margin-top: 18px;
+    font-size: clamp(2rem, 3.4vw, 2.75rem);
+    font-weight: 900;
+    font-stretch: 85%;
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+  }
+
+  .ficha__ciudad {
+    margin-top: 6px;
+    color: var(--negro);
+    font-size: var(--t-chica);
+    font-weight: 700;
+  }
+
+  .ficha__abrebocas {
+    margin: 12px 0 18px;
+    line-height: 1.4;
+  }
+
+  .ficha .etiquetas {
+    margin-top: auto;
+  }
+
+  @media (max-width: 520px) {
+    .ficha__marco :global(.ficha__foto) {
+      aspect-ratio: 1;
+    }
+    .ficha__sello {
+      top: -18px;
+      right: -10px;
+      width: 68px;
+      height: 68px;
+    }
+  }
+</style>

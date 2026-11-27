@@ -1,0 +1,656 @@
+---
+// Perfil público: musicmafia.pages.dev/<enlace-del-productor>
+// Izquierda: el productor. Centro: los géneros de sus beats (filtran). Derecha: los beats.
+import type { GetStaticPaths } from 'astro';
+import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+import Onda from '../components/Onda.astro';
+import Estrella from '../components/Estrella.astro';
+import FotoZine from '../components/FotoZine.astro';
+import BarraReproductor from '../components/BarraReproductor.astro';
+import { productores, generosDe, minutos, ES_DEMO, type Productor } from '../data/catalogo';
+import { SITIO, gmail } from '../lib/sitio';
+
+export const getStaticPaths = (() => productores().map((p) => ({ params: { productor: p.slug }, props: { p } }))) satisfies GetStaticPaths;
+
+const { p } = Astro.props as { p: Productor };
+const generos = generosDe(p);
+const enlacePublico = `${SITIO.url}/${p.slug}`;
+const totalBeats = `${p.beats.length} ${p.beats.length === 1 ? 'beat' : 'beats'}`;
+
+// Redes en el orden del perfil. Instagram o correo siempre hay al menos uno; YouTube y Spotify solo si los puso.
+// El primero que exista va como botón principal (negro) y los demás como secundarios.
+const redes = [
+  p.instagram && { icono: 'instagram', texto: 'instagram', href: `https://instagram.com/${p.instagram}` },
+  p.correo && { icono: 'correo', texto: 'correo', href: gmail(p.correo, 'Vi tus beats en MusicMafia') },
+  p.youtube && { icono: 'youtube', texto: 'youtube', href: p.youtube },
+  p.spotify && { icono: 'spotify', texto: 'spotify', href: p.spotify },
+].filter(Boolean) as { icono: 'instagram' | 'correo' | 'youtube' | 'spotify'; texto: string; href: string }[];
+---
+<Base titulo={p.nombre} descripcion={`${p.abrebocas} Escucha sus beats en MusicMafia.`} imagen={p.foto ?? undefined} seccion="productores" color={p.color}>
+  <div class="perfil contenedor">
+    <section class="panel info" aria-labelledby="t-nombre">
+      <div class="info__foto">
+        <FotoZine src={p.foto} nombre={p.nombre} alt={`Foto de ${p.nombre}`} semilla={`perfil-${p.slug}`} estrellas={3} carga="eager" />
+        <p class="info__guion guion" aria-hidden="true">{p.nombre}</p>
+      </div>
+      <div class="info__cabecera">
+        <h1 id="t-nombre" class="info__nombre">{p.nombre.toLowerCase()}</h1>
+        {p.ciudad && <p class="info__ciudad">{p.ciudad.toLowerCase()}</p>}
+      </div>
+      <div class="info__cuerpo">
+        <div class="info__contacto">
+          {redes.map((r, i) =>
+            ES_DEMO ? (
+              <a class:list={['boton', i === 0 ? 'boton--primario' : 'boton--secundario']} aria-disabled="true"><Icono nombre={r.icono} />{r.texto}</a>
+            ) : (
+              <a class:list={['boton', i === 0 ? 'boton--primario' : 'boton--secundario']} href={r.href} target="_blank" rel="noopener noreferrer"><Icono nombre={r.icono} />{r.texto}</a>
+            ),
+          )}
+        </div>
+        {ES_DEMO && <p class="info__nota">En el prototipo, los enlaces de contacto no abren nada.</p>}
+
+        <div class="info__compartir">
+          <span class="info__url" title={enlacePublico}>{SITIO.dominio}/{p.slug}</span>
+          <button type="button" class="info__copiar" data-copiar={enlacePublico}>
+            <Icono nombre="enlace" class="si-normal" /><Icono nombre="listo" class="si-copiado" />
+            <span data-copiar-texto aria-live="polite">copiar enlace</span>
+          </button>
+        </div>
+
+        {p.bio && <p class="info__bio">{p.bio}</p>}
+      </div>
+    </section>
+
+    <section class="panel generos" aria-labelledby="t-generos">
+      <h2 id="t-generos" class="panel__titulo">géneros</h2>
+      <ul class="filtros">
+        <li>
+          <button type="button" class="filtro" data-filtro="" aria-pressed="true">
+            <Estrella semilla="filtro-todos" class="filtro__estrella" />
+            <span class="filtro__nombre">todos</span><span class="filtro__n">{p.beats.length}</span>
+          </button>
+        </li>
+        {generos.map(({ genero, cuantos }) => (
+          <li>
+            <button type="button" class="filtro" data-filtro={genero.slug} aria-pressed="false">
+              <Estrella semilla={`filtro-${genero.slug}`} class="filtro__estrella" />
+              <span class="filtro__nombre">{genero.nombre.toLowerCase()}</span><span class="filtro__n">{cuantos}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="panel beats" aria-labelledby="t-beats">
+      <header class="beats__cabecera">
+        <h2 id="t-beats" class="panel__titulo">beats</h2>
+        <p class="beats__cuenta" data-cuenta aria-live="polite">{totalBeats}</p>
+      </header>
+
+      <ol class="beats__lista" data-beats data-autor={p.nombre}>
+        {p.beats.map((b) => (
+          <li
+            class="beat"
+            data-beat
+            data-genero={b.genero.slug}
+            data-titulo={b.titulo}
+            data-audio={b.audio}
+            data-portada={b.portada}
+            data-duracion={b.duracion}
+          >
+            <button type="button" class="beat__boton" data-tocar aria-label={`Reproducir ${b.titulo}`}>
+              <span class="beat__portada">
+                <img src={b.portada} alt="" width="600" height="600" loading="lazy" />
+                <span class="beat__icono">
+                  <Icono nombre="tocar" class="si-pausa" /><Icono nombre="pausa" class="si-sonando" />
+                </span>
+              </span>
+              <span class="beat__titulo">{b.titulo.toLowerCase()}</span>
+              <span class="etiqueta beat__genero">{b.genero.nombre}</span>
+              <span class="beat__duracion">{minutos(b.duracion)}</span>
+            </button>
+            <div class="beat__detalle">
+              <div class="beat__interior">
+                <div
+                  class="beat__onda"
+                  data-onda
+                  role="slider"
+                  tabindex="0"
+                  aria-label={`Posición en ${b.titulo}`}
+                  aria-valuemin="0"
+                  aria-valuemax={Math.round(b.duracion)}
+                  aria-valuenow="0"
+                  aria-valuetext={`0:00 de ${minutos(b.duracion)}`}
+                >
+                  <Onda picos={b.picos} />
+                </div>
+                <p class="beat__tiempos"><span data-actual>0:00</span><span>{minutos(b.duracion)}</span></p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </div>
+
+  <BarraReproductor slot="final" />
+</Base>
+
+<script>
+  import '../scripts/reproductor';
+</script>
+
+<style>
+  .perfil {
+    display: grid;
+    grid-template-areas: 'info generos beats';
+    grid-template-columns: minmax(280px, 350px) 220px minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
+    max-width: calc(1480px + 2 * var(--margen));
+    padding-top: 32px;
+    padding-bottom: 128px;
+  }
+
+  /* Paneles: papel pegado sobre el rojo. */
+  .panel {
+    position: relative;
+    padding: 22px;
+    background: var(--hoja);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  }
+
+  .panel__titulo {
+    font-size: 1.75rem;
+    font-weight: 900;
+    font-stretch: 85%;
+    letter-spacing: -0.06em;
+  }
+
+  /* ---------- Productor ---------- */
+  .info {
+    grid-area: info;
+  }
+
+  /* Tira de cinta adhesiva arriba del panel. */
+  .info::before {
+    content: '';
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    z-index: 3;
+    width: 110px;
+    height: 28px;
+    background: rgba(236, 233, 227, 0.72);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transform: translateX(-50%) rotate(-4deg);
+  }
+
+  @media (min-width: 1100px) and (min-height: 880px) {
+    .info {
+      position: sticky;
+      top: calc(var(--nav-alto) + 24px);
+    }
+  }
+
+  .info__foto {
+    position: relative;
+  }
+
+  .info__foto :global(.foto-zine) {
+    aspect-ratio: 1;
+  }
+
+  .info__guion {
+    position: absolute;
+    left: 6%;
+    bottom: -0.32em;
+    z-index: 2;
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--marca);
+    font-size: clamp(3.5rem, 6vw, 5.25rem);
+    transform: rotate(-7deg);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .info__cabecera {
+    margin-top: 28px;
+  }
+
+  .info__nombre {
+    font-size: clamp(2.75rem, 4.2vw, 3.75rem);
+    font-weight: 900;
+    font-stretch: 82%;
+    line-height: 0.85;
+    letter-spacing: -0.065em;
+  }
+
+  .info__ciudad {
+    margin-top: 8px;
+    color: var(--negro);
+    font-size: var(--t-chica);
+    font-weight: 700;
+  }
+
+  .info__bio {
+    margin-top: 20px;
+    font-size: 0.96875rem;
+    line-height: 1.5;
+  }
+
+  /* Redes: de dos en dos. Si quedan impares, la última ocupa todo el ancho. */
+  .info__contacto {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .info__contacto .boton {
+    padding-inline: 12px;
+  }
+
+  .info__contacto .boton:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .info__nota {
+    margin-top: 8px;
+    color: var(--texto-2);
+    font-size: var(--t-micro);
+  }
+
+  /* El enlace para la bio, en un cupón con línea de corte. */
+  .info__compartir {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 6px 6px 6px 12px;
+    border: 2px dashed var(--negro);
+  }
+
+  .info__url {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--t-chica);
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .info__copiar {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 0;
+    background: var(--negro);
+    color: var(--claro);
+    font-size: var(--t-chica);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .info__copiar:hover {
+    background: var(--marca);
+    color: var(--negro);
+  }
+
+  .info__copiar :global(.si-copiado),
+  .info__copiar[data-copiado] :global(.si-normal) {
+    display: none;
+  }
+
+  .info__copiar[data-copiado] :global(.si-copiado) {
+    display: block;
+  }
+
+  /* ---------- Géneros ---------- */
+  .generos {
+    grid-area: generos;
+    position: sticky;
+    top: calc(var(--nav-alto) + 24px);
+    padding: 22px 10px 10px;
+  }
+
+  .generos .panel__titulo {
+    padding: 0 12px;
+  }
+
+  .filtros {
+    display: grid;
+    gap: 0;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .filtros li + li {
+    border-top: 1px solid rgba(0, 0, 0, 0.18);
+  }
+
+  .filtro {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .filtro:hover {
+    background: var(--hoja-2);
+  }
+
+  .filtro :global(.filtro__estrella) {
+    width: 16px;
+    height: 16px;
+    color: var(--marca);
+    visibility: hidden;
+  }
+
+  .filtro[aria-pressed='true'] {
+    background: var(--negro);
+    color: var(--claro);
+    font-weight: 800;
+  }
+
+  .filtro[aria-pressed='true'] :global(.filtro__estrella) {
+    visibility: visible;
+  }
+
+  .filtro__n {
+    font-size: var(--t-chica);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .filtro:focus-visible {
+    outline-offset: -3px;
+  }
+
+  /* ---------- Beats: lista impresa ---------- */
+  .beats {
+    grid-area: beats;
+    padding: 22px 10px 10px;
+  }
+
+  .beats__cabecera {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 12px 12px;
+    border-bottom: 2px solid var(--negro);
+  }
+
+  .beats__cuenta {
+    font-size: var(--t-chica);
+    font-weight: 700;
+  }
+
+  .beats__lista {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .beat {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  }
+
+  .beat:hover {
+    background: var(--hoja-2);
+  }
+
+  .beat.beat--activa {
+    --onda-base: #4a4744;
+    --onda-hecha: var(--marca);
+    --foco: var(--claro);
+    background: var(--negro);
+    color: var(--claro);
+  }
+
+  .beat__boton {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr) auto 3.2em;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 10px 14px 10px 10px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .beat__portada {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    width: 60px;
+    height: 60px;
+  }
+
+  .beat__portada img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .beat__icono {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: var(--blanco);
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 140ms ease;
+  }
+
+  .beat__boton:hover .beat__icono,
+  .beat__boton:focus-visible .beat__icono,
+  .beat[data-estado] .beat__icono {
+    opacity: 1;
+  }
+
+  .beat[data-estado] .beat__icono {
+    background: color-mix(in srgb, var(--marca) 85%, transparent);
+    color: var(--negro);
+  }
+
+  .beat__icono :global(.si-sonando),
+  .beat[data-estado='sonando'] .beat__icono :global(.si-pausa) {
+    display: none;
+  }
+
+  .beat[data-estado='sonando'] .beat__icono :global(.si-sonando) {
+    display: block;
+  }
+
+  .beat__titulo {
+    overflow: hidden;
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .beat--activa .beat__genero {
+    background: var(--marca);
+    color: var(--negro);
+  }
+
+  .beat__duracion {
+    font-size: var(--t-chica);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  /* Detalle desplegable con la forma de onda */
+  .beat__detalle {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition: grid-template-rows 300ms cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s linear 300ms;
+  }
+
+  .beat--activa .beat__detalle {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows 300ms cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s;
+  }
+
+  .beat__interior {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .beat__onda {
+    height: 60px;
+    margin: 2px 16px 0 86px;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .beat__onda:focus-visible {
+    outline-offset: 4px;
+  }
+
+  .beat__tiempos {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 16px 14px 86px;
+    color: var(--gris-noche);
+    font-size: var(--t-micro);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tablet: el productor arriba; géneros y beats lado a lado */
+  @media (max-width: 1099px) {
+    .perfil {
+      grid-template-areas: 'info info' 'generos beats';
+      grid-template-columns: 200px minmax(0, 1fr);
+    }
+    .info {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      column-gap: 28px;
+    }
+    .info__foto {
+      grid-row: 1 / span 2;
+    }
+    .info__cabecera {
+      margin-top: 4px;
+    }
+    .info__cuerpo {
+      max-width: 60ch;
+    }
+  }
+
+  /* Móvil: una columna; los géneros pasan a ser una fila deslizable */
+  @media (max-width: 759px) {
+    .perfil {
+      grid-template-areas: 'info' 'generos' 'beats';
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+      padding-top: 24px;
+    }
+    .panel {
+      padding: 14px;
+    }
+    .info {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .info__foto {
+      grid-row: auto;
+    }
+    .info__cabecera {
+      margin-top: 26px;
+    }
+    .generos {
+      position: static;
+      padding: 14px 0 12px;
+    }
+    .generos .panel__titulo {
+      padding: 0 14px;
+    }
+    .filtros {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 0 14px 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filtros::-webkit-scrollbar {
+      display: none;
+    }
+    .filtros li + li {
+      border-top: 0;
+    }
+    .filtro {
+      grid-template-columns: auto auto;
+      width: auto;
+      min-height: 40px;
+      padding: 0 12px;
+      border: 2px solid var(--negro);
+      white-space: nowrap;
+    }
+    .filtro :global(.filtro__estrella) {
+      display: none;
+    }
+    .beats {
+      padding: 14px 4px 4px;
+    }
+    .beats__cabecera {
+      padding: 0 10px 10px;
+    }
+    .beat__boton {
+      grid-template-columns: 54px minmax(0, 1fr) auto;
+      grid-template-areas: 'portada titulo duracion' 'portada genero duracion';
+      gap: 4px 12px;
+      padding: 8px 10px 8px 8px;
+    }
+    .beat__portada {
+      grid-area: portada;
+      width: 54px;
+      height: 54px;
+    }
+    .beat__titulo {
+      grid-area: titulo;
+      font-size: 1.25rem;
+    }
+    .beat__genero {
+      grid-area: genero;
+      justify-self: start;
+    }
+    .beat__duracion {
+      grid-area: duracion;
+    }
+    .beat__onda,
+    .beat__tiempos {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  }
+</style>

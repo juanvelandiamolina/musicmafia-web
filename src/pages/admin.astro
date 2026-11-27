@@ -1,0 +1,498 @@
+---
+// Administración de MusicMafia: invitar, revisar, publicar y retirar productores, ocultar beats y actualizar la web.
+// La página es pública como archivo, pero sin una sesión de administrador la base de datos no devuelve ni hace nada.
+import Panel from '../layouts/Panel.astro';
+import { SITIO } from '../lib/sitio';
+---
+<Panel titulo="Administración" zona="admin">
+  <p class="cargando" data-cargando>abriendo la administración…</p>
+
+  <div class="admin" data-admin hidden>
+    <header class="admin__cabecera">
+      <h1 class="admin__titulo">la puerta.</h1>
+      <p class="admin__lema">Quién entra, qué se publica y qué se retira.</p>
+    </header>
+
+    <section class="hoja" aria-labelledby="t-invitar">
+      <h2 id="t-invitar" class="hoja__titulo">invitar a un productor</h2>
+      <p class="hoja__intro">
+        Le llega un correo para crear su contraseña y aceptar las condiciones. Su perfil no se ve hasta que tú lo publiques.
+      </p>
+      <form class="formulario invitar" data-form-invitar novalidate>
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="i-nombre">nombre artístico</label>
+            <input id="i-nombre" maxlength="40" required autocomplete="off" />
+          </div>
+          <div class="campo">
+            <label for="i-correo">correo</label>
+            <input id="i-correo" type="email" required autocomplete="off" inputmode="email" />
+          </div>
+        </div>
+        <div class="campo">
+          <label for="i-enlace">enlace del perfil</label>
+          <div class="prefijo"><span>{SITIO.dominio}/</span><input id="i-enlace" maxlength="30" required autocomplete="off" autocapitalize="off" spellcheck="false" /></div>
+          <p class="campo__pie"><span data-enlace-estado>Minúsculas, números y guiones. Es el enlace que pondrá en su bio.</span></p>
+        </div>
+        <p class="mensaje" data-mensaje hidden></p>
+        <div class="acciones"><button class="boton" type="submit">mandar invitación</button></div>
+      </form>
+    </section>
+
+    <section class="hoja" aria-labelledby="t-productores">
+      <div class="lista-cabecera">
+        <h2 id="t-productores" class="hoja__titulo">productores</h2>
+        <div class="filtros-admin" role="group" aria-label="Filtrar por estado" data-filtros>
+          <button type="button" aria-pressed="true" data-filtro="">todos</button>
+          <button type="button" aria-pressed="false" data-filtro="en_revision">en revisión</button>
+          <button type="button" aria-pressed="false" data-filtro="publicado">publicados</button>
+          <button type="button" aria-pressed="false" data-filtro="borrador">sin publicar</button>
+          <button type="button" aria-pressed="false" data-filtro="retirado">retirados</button>
+        </div>
+      </div>
+      <ul class="filas-admin" data-filas></ul>
+      <p class="vacio-panel" data-vacio hidden>Nadie en este grupo.</p>
+
+      <template data-tpl-fila>
+        <li class="fila-admin">
+          <div class="fila-admin__cabeza">
+            <div>
+              <p class="fila-admin__nombre" data-nombre></p>
+              <p class="fila-admin__enlace"><a data-enlace target="_blank" rel="noopener"></a> · <span data-correo></span></p>
+            </div>
+            <span class="etiqueta fila-admin__estado" data-estado></span>
+          </div>
+          <p class="fila-admin__meta" data-meta></p>
+          <p class="mensaje" data-nota hidden></p>
+          <div class="acciones" data-acciones></div>
+          <form class="formulario nota-form" data-form-nota hidden novalidate>
+            <div class="campo">
+              <label data-nota-etiqueta>nota para el productor</label>
+              <textarea maxlength="500" data-nota-texto></textarea>
+              <p class="campo__pie"><span>La ve en su panel. Opcional.</span></p>
+            </div>
+            <div class="acciones">
+              <button class="boton boton--chico" type="submit" data-nota-confirmar>confirmar</button>
+              <button class="boton boton--secundario boton--chico" type="button" data-nota-cancelar>cancelar</button>
+            </div>
+          </form>
+          <div class="beats-admin" data-beats hidden></div>
+          <p class="mensaje" data-mensaje hidden></p>
+        </li>
+      </template>
+    </section>
+
+    <section class="hoja" aria-labelledby="t-generos">
+      <h2 id="t-generos" class="hoja__titulo">géneros</h2>
+      <p class="hoja__intro">
+        Son los que eligen los productores para cada beat y como estilos de su perfil, y los filtros de cada perfil.
+        Uno nuevo aparece en los paneles al instante. Si quitas uno que tiene beats, eliges a qué género pasarlos.
+      </p>
+      <form class="nuevo-genero" data-form-genero novalidate>
+        <div class="campo">
+          <label for="g-nombre">nuevo género</label>
+          <input id="g-nombre" maxlength="24" autocomplete="off" placeholder="por ejemplo, Ambient" />
+        </div>
+        <button class="boton" type="submit">agregar</button>
+      </form>
+      <p class="mensaje" data-mensaje-generos hidden></p>
+      <ul class="generos-admin" data-generos></ul>
+
+      <template data-tpl-genero>
+        <li class="genero-admin">
+          <div class="genero-admin__fila">
+            <span class="genero-admin__nombre" data-nombre></span>
+            <span class="genero-admin__uso" data-uso></span>
+            <button type="button" class="boton boton--secundario boton--chico" data-quitar>quitar</button>
+          </div>
+          <form class="genero-admin__pasar" data-form-pasar hidden novalidate>
+            <label data-pasar-etiqueta></label>
+            <select data-pasar-a></select>
+            <button class="boton boton--chico boton--peligro" type="submit">pasar y quitar</button>
+            <button class="boton boton--secundario boton--chico" type="button" data-cancelar>cancelar</button>
+          </form>
+        </li>
+      </template>
+    </section>
+
+    <section class="hoja" aria-labelledby="t-colores">
+      <h2 id="t-colores" class="hoja__titulo">colores</h2>
+      <p class="hoja__intro">
+        Cada productor elige uno en su panel: es el fondo de su perfil, el marco de su foto y sus detalles. Tienen que
+        ser lo bastante claros para leer texto negro encima. Si quitas uno, quienes lo usaban vuelven al rojo.
+      </p>
+      <form class="nuevo-color" data-form-color novalidate>
+        <div class="campo">
+          <label for="c-nombre">nombre</label>
+          <input id="c-nombre" maxlength="24" autocomplete="off" placeholder="por ejemplo, Menta" />
+        </div>
+        <div class="campo">
+          <label for="c-hex">color</label>
+          <input id="c-hex" type="color" value="#7ee8c6" />
+        </div>
+        <button class="boton" type="submit">agregar</button>
+        <p class="nuevo-color__prueba" data-prueba-color aria-live="polite"></p>
+      </form>
+      <p class="mensaje" data-mensaje-colores hidden></p>
+      <ul class="colores-admin" data-colores-admin></ul>
+
+      <template data-tpl-color>
+        <li class="color-admin">
+          <span class="color-admin__mancha" data-mancha aria-hidden="true"></span>
+          <span class="color-admin__nombre" data-nombre></span>
+          <span class="color-admin__uso" data-uso></span>
+          <button type="button" class="boton boton--secundario boton--chico" data-quitar>quitar</button>
+        </li>
+      </template>
+    </section>
+
+    <section class="hoja" aria-labelledby="t-web">
+      <h2 id="t-web" class="hoja__titulo">la web</h2>
+      <p class="hoja__intro">
+        La web pública se vuelve a armar sola un par de minutos después de cada cambio en algo publicado. Este botón la
+        actualiza aunque no haya cambios.
+      </p>
+      <dl class="datos-web" data-web></dl>
+      <p class="mensaje" data-mensaje hidden></p>
+      <div class="acciones"><button type="button" class="boton boton--secundario" data-reconstruir>actualizar la web ahora</button></div>
+    </section>
+  </div>
+  <audio data-reproductor preload="none"></audio>
+</Panel>
+
+<script>
+  import '../scripts/panel/admin';
+</script>
+
+<style>
+  .admin {
+    max-width: 1040px;
+  }
+
+  .admin__cabecera {
+    margin-bottom: 28px;
+  }
+
+  .admin__titulo {
+    font-size: clamp(3.5rem, 11vw, 8rem);
+    font-weight: 900;
+    font-stretch: 80%;
+    line-height: 0.8;
+    letter-spacing: -0.07em;
+  }
+
+  .admin__lema {
+    margin-top: 12px;
+    font-size: var(--t-entrada);
+    font-weight: 600;
+  }
+
+  .invitar {
+    margin-top: 20px;
+  }
+
+  .lista-cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .filtros-admin {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filtros-admin button {
+    min-height: 40px;
+    padding: 6px 12px;
+    border: 2px solid var(--negro);
+    background: transparent;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .filtros-admin button[aria-pressed='true'] {
+    background: var(--negro);
+    color: var(--claro);
+  }
+
+  .filas-admin {
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--negro);
+  }
+
+  .fila-admin {
+    display: grid;
+    gap: 10px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--negro);
+  }
+
+  .fila-admin__cabeza {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .fila-admin__nombre {
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-stretch: 85%;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .fila-admin__enlace {
+    margin-top: 4px;
+    font-size: var(--t-chica);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .fila-admin__estado[data-de='en_revision'] {
+    background: var(--hoja-2);
+    color: var(--negro);
+  }
+
+  .fila-admin__estado[data-de='retirado'] {
+    background: var(--rojo-hondo);
+    color: var(--blanco);
+  }
+
+  .fila-admin__estado[data-de='borrador'] {
+    background: var(--gris);
+    color: var(--blanco);
+  }
+
+  .fila-admin__meta {
+    color: var(--texto-2);
+    font-size: var(--t-chica);
+    font-weight: 600;
+  }
+
+  .nota-form {
+    padding: 16px;
+    border: 2px dashed var(--negro);
+    background: var(--hoja-2);
+  }
+
+  .nota-form textarea {
+    min-height: 90px !important;
+  }
+
+  .beats-admin {
+    display: grid;
+    gap: 0;
+    border-top: 1px dashed var(--negro);
+  }
+
+  .beat-admin {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--negro);
+  }
+
+  .beat-admin img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+  }
+
+  .beat-admin__titulo {
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .beat-admin__titulo small {
+    display: block;
+    color: var(--texto-2);
+    font-weight: 600;
+  }
+
+  .beat-admin[data-oculto] .beat-admin__titulo {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  .nuevo-genero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .nuevo-genero .campo {
+    flex: 1 1 240px;
+    max-width: 360px;
+  }
+
+  [data-mensaje-generos] {
+    margin-top: 14px;
+  }
+
+  .generos-admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 0 28px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--negro);
+  }
+
+  .genero-admin {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--negro);
+  }
+
+  .genero-admin__fila {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .genero-admin__nombre {
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .genero-admin__uso {
+    flex: 1;
+    color: var(--texto-2);
+    font-size: var(--t-chica);
+    font-weight: 600;
+  }
+
+  .genero-admin__pasar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 12px;
+    border: 2px dashed var(--negro);
+    background: var(--hoja-2);
+    font-size: var(--t-chica);
+    font-weight: 700;
+  }
+
+  .genero-admin__pasar label {
+    flex-basis: 100%;
+  }
+
+  .genero-admin__pasar select {
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 2px solid var(--negro);
+    border-radius: 0;
+    background: #f7f5f1;
+    font: inherit;
+  }
+
+  .nuevo-color {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .nuevo-color .campo:first-child {
+    flex: 1 1 200px;
+    max-width: 280px;
+  }
+
+  .nuevo-color input[type='color'] {
+    width: 72px;
+    height: 48px;
+    padding: 2px;
+    border: 2px solid var(--negro);
+    background: var(--blanco);
+    cursor: pointer;
+  }
+
+  .nuevo-color__prueba {
+    flex-basis: 100%;
+    font-size: var(--t-chica);
+    font-weight: 700;
+  }
+
+  .nuevo-color__prueba span {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 4px 10px;
+    border: 2px solid var(--negro);
+    color: var(--negro);
+  }
+
+  [data-mensaje-colores] {
+    margin-top: 14px;
+  }
+
+  .colores-admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 0 28px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--negro);
+  }
+
+  .color-admin {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--negro);
+  }
+
+  .color-admin__mancha {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--negro);
+  }
+
+  .color-admin__nombre {
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .color-admin__uso {
+    flex: 1;
+    color: var(--texto-2);
+    font-size: var(--t-chica);
+    font-weight: 600;
+  }
+
+  .datos-web {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px 18px;
+    margin: 18px 0;
+  }
+
+  .datos-web dt {
+    font-weight: 800;
+  }
+
+  .datos-web dd {
+    margin: 0;
+  }
+</style>

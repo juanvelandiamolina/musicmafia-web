@@ -1,0 +1,305 @@
+{
+  "demo": true,
+  "generos": [
+    {
+      "slug": "trap",
+      "nombre": "Trap"
+    },
+    {
+      "slug": "drill",
+      "nombre": "Drill"
+    },
+    {
+      "slug": "rnb",
+      "nombre": "R&B"
+    },
+    {
+      "slug": "reggaeton",
+      "nombre": "Reggaetón"
+    },
+    {
+      "slug": "dembow",
+      "nombre": "Dembow"
+    },
+    {
+      "slug": "afrobeat",
+      "nombre": "Afrobeat"
+    },
+    {
+      "slug": "amapiano",
+      "nombre": "Amapiano"
+    },
+    {
+      "slug": "boom-bap",
+      "nombre": "Boom Bap"
+    },
+    {
+      "slug": "lofi",
+      "nombre": "Lo-fi"
+    },
+    {
+      "slug": "phonk",
+      "nombre": "Phonk"
+    }
+  ],
+  "productores": [
+    {
+      "slug": "nocturno",
+      "nombre": "Nocturno",
+      "ciudad": "Bogotá",
+      "invitacion": 1,
+      "desde": 2026,
+      "abrebocas": "808 largos, melodías frías y espacio para que la voz respire.",
+      "bio": "Empezó haciendo beats en un portátil prestado en Kennedy y no ha parado. Trabaja de noche y con pocas capas: un 808 largo, una melodía fría y espacio de sobra para que la voz respire.",
+      "tags": [
+        "trap",
+        "drill",
+        "rnb"
+      ],
+      "instagram": "nocturno",
+      "correo": "nocturno@example.com",
+      "beats": [
+        {
+          "titulo": "Neblina",
+          "genero": "trap"
+        },
+        {
+          "titulo": "Calle 26",
+          "genero": "trap"
+        },
+        {
+          "titulo": "Último bus",
+          "genero": "drill"
+        },
+        {
+          "titulo": "Sin señal",
+          "genero": "trap"
+        },
+        {
+          "titulo": "Frío de páramo",
+          "genero": "rnb"
+        },
+        {
+          "titulo": "Vidrio",
+          "genero": "drill"
+        },
+        {
+          "titulo": "Madrugada",
+          "genero": "rnb"
+        }
+      ],
+      "youtube": "https://www.youtube.com/@nocturno",
+      "spotify": "https://open.spotify.com/artist/0000000000000000000000"
+    },
+    {
+      "slug": "lia",
+      "nombre": "Lía",
+      "ciudad": "Medellín",
+      "invitacion": 2,
+      "desde": 2026,
+      "abrebocas": "Viene de la batería y se nota: la percusión manda en cada beat.",
+      "bio": "Tocó batería en bandas de barrio antes de abrir un programa de producción. Por eso sus beats arrancan por la percusión y todo lo demás se acomoda alrededor: reggaetón con calle, dembow acelerado y algo de afro cuando el cuerpo lo pide.",
+      "tags": [
+        "reggaeton",
+        "dembow",
+        "afrobeat"
+      ],
+      "instagram": "lia",
+      "correo": "lia@example.com",
+      "beats": [
+        {
+          "titulo": "Aguacero",
+          "genero": "reggaeton"
+        },
+        {
+          "titulo": "Envigado",
+          "genero": "reggaeton"
+        },
+        {
+          "titulo": "Kilómetro 0",
+          "genero": "dembow"
+        },
+        {
+          "titulo": "Perreo lento",
+          "genero": "reggaeton"
+        },
+        {
+          "titulo": "Sal",
+          "genero": "afrobeat"
+        },
+        {
+          "titulo": "Terraza",
+          "genero": "dembow"
+        }
+      ]
+    },
+    {
+      "slug": "monte-bajo",
+      "nombre": "Monte Bajo",
+      "ciudad": "Cali",
+      "invitacion": 3,
+      "desde": 2026,
+      "abrebocas": "Samples de vinilo, baterías polvorientas y una MPC que ya no se fabrica.",
+      "bio": "Creció entre los discos de salsa y soul de su papá, y de ahí saca casi todo. Corta samples de vinilo, ensucia las baterías a propósito y deja que el swing haga el resto.",
+      "tags": [
+        "boom-bap",
+        "lofi",
+        "rnb"
+      ],
+      "instagram": "montebajo",
+      "correo": "montebajo@example.com",
+      "beats": [
+        {
+          "titulo": "Cassette",
+          "genero": "boom-bap"
+        },
+        {
+          "titulo": "Polvo",
+          "genero": "boom-bap"
+        },
+        {
+          "titulo": "Café frío",
+          "genero": "lofi"
+        },
+        {
+          "titulo": "Barrio Obrero",
+          "genero": "boom-bap"
+        },
+        {
+          "titulo": "Ventana",
+          "genero": "lofi"
+        },
+        {
+          "titulo": "Domingo",
+          "genero": "rnb"
+        }
+      ]
+    },
+    {
+      "slug": "kalima",
+      "nombre": "Kalima",
+      "ciudad": "Barranquilla",
+      "invitacion": 4,
+      "desde": 2026,
+      "abrebocas": "Caribe con log drums: beats que caminan solos antes de que entre la voz.",
+      "bio": "Mezcla lo que escuchó en los picós de Barranquilla con lo que llega de Lagos y Johannesburgo. Le gusta que el beat camine solo un rato antes de que entre la voz.",
+      "tags": [
+        "afrobeat",
+        "amapiano",
+        "reggaeton"
+      ],
+      "instagram": "kalima",
+      "correo": "kalima@example.com",
+      "beats": [
+        {
+          "titulo": "Marea",
+          "genero": "afrobeat"
+        },
+        {
+          "titulo": "Brisa",
+          "genero": "amapiano"
+        },
+        {
+          "titulo": "Guayacán",
+          "genero": "afrobeat"
+        },
+        {
+          "titulo": "Picó",
+          "genero": "amapiano"
+        },
+        {
+          "titulo": "Sirena",
+          "genero": "reggaeton"
+        },
+        {
+          "titulo": "Malecón",
+          "genero": "amapiano"
+        }
+      ]
+    },
+    {
+      "slug": "ferro",
+      "nombre": "Ferro",
+      "ciudad": "Pereira",
+      "invitacion": 5,
+      "desde": 2026,
+      "abrebocas": "Distorsión controlada, cencerros con mala intención y bajos que se sienten.",
+      "bio": "Ingeniero de sonido de día. De noche satura todo lo que puede sin que se rompa: cencerros, 808 distorsionados y baterías que se sienten en el pecho.",
+      "tags": [
+        "phonk",
+        "drill",
+        "trap"
+      ],
+      "instagram": "ferro",
+      "correo": "ferro@example.com",
+      "beats": [
+        {
+          "titulo": "Óxido",
+          "genero": "phonk"
+        },
+        {
+          "titulo": "Asfalto",
+          "genero": "drill"
+        },
+        {
+          "titulo": "Hierro",
+          "genero": "phonk"
+        },
+        {
+          "titulo": "Cobre",
+          "genero": "trap"
+        },
+        {
+          "titulo": "Humo",
+          "genero": "phonk"
+        },
+        {
+          "titulo": "Curva",
+          "genero": "drill"
+        }
+      ]
+    },
+    {
+      "slug": "vela",
+      "nombre": "Vela",
+      "ciudad": "Bogotá",
+      "invitacion": 6,
+      "desde": 2026,
+      "abrebocas": "Piano eléctrico y baterías suaves. Música para escuchar con audífonos.",
+      "bio": "Estudió piano clásico y lo cambió por el R&B. Sus beats tienen acordes largos, baterías suaves y silencios bien puestos. Se escuchan mejor con audífonos.",
+      "tags": [
+        "rnb",
+        "lofi",
+        "afrobeat"
+      ],
+      "instagram": "vela",
+      "correo": "vela@example.com",
+      "beats": [
+        {
+          "titulo": "Luz baja",
+          "genero": "rnb"
+        },
+        {
+          "titulo": "Bruma",
+          "genero": "lofi"
+        },
+        {
+          "titulo": "Fuego lento",
+          "genero": "rnb"
+        },
+        {
+          "titulo": "Usaquén",
+          "genero": "lofi"
+        },
+        {
+          "titulo": "Seda",
+          "genero": "rnb"
+        },
+        {
+          "titulo": "Atardecer",
+          "genero": "afrobeat"
+        }
+      ]
+    }
+  ]
+}

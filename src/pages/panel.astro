@@ -1,0 +1,661 @@
+---
+// Panel del productor: su perfil, sus beats y su cuenta. Todo se dibuja en el navegador con sus datos.
+import Panel from '../layouts/Panel.astro';
+import CasillasAceptar from '../components/CasillasAceptar.astro';
+import Estrella from '../components/Estrella.astro';
+import { SITIO, gmail } from '../lib/sitio';
+import { LEGAL } from '../lib/legal';
+---
+<Panel titulo="Tu panel" zona="panel">
+  <p class="cargando" data-cargando>abriendo tu panel…</p>
+
+  <div class="panel-productor" data-panel hidden>
+    <header class="cabecera-panel">
+      <div class="cabecera-panel__foto" data-cabecera-foto aria-hidden="true"></div>
+      <div>
+        <h1 class="cabecera-panel__nombre" data-nombre></h1>
+        <p class="cabecera-panel__enlace">{SITIO.dominio}/<span data-enlace></span></p>
+      </div>
+    </header>
+
+    <section class="hoja estado" data-estado aria-live="polite">
+      <Estrella semilla="estado-panel" class="estado__estrella" />
+      <h2 class="estado__titulo" data-estado-titulo></h2>
+      <p class="estado__texto" data-estado-texto></p>
+      <p class="mensaje" data-estado-nota hidden></p>
+      <ul class="estado__faltan" data-faltan hidden></ul>
+      <div class="acciones" data-estado-acciones></div>
+      <p class="mensaje" data-mensaje hidden></p>
+    </section>
+
+    <form class="hoja formulario reaceptar" data-reaceptar hidden novalidate>
+      <h2 class="hoja__titulo">cambiaron las condiciones.</h2>
+      <p class="hoja__intro">
+        Actualizamos los documentos (versión {LEGAL.version}). Para seguir editando tu perfil, léelos y acéptalos de nuevo.
+      </p>
+      <CasillasAceptar id="re" soloObligatorias />
+      <p class="mensaje" data-mensaje hidden></p>
+      <div class="acciones"><button class="boton" type="submit">aceptar y seguir</button></div>
+    </form>
+
+    <div class="pestanas" role="tablist" aria-label="Secciones del panel">
+      <button type="button" role="tab" id="t-perfil" aria-controls="p-perfil" aria-selected="true" data-pestana="perfil">perfil</button>
+      <button type="button" role="tab" id="t-beats" aria-controls="p-beats" aria-selected="false" tabindex="-1" data-pestana="beats">
+        beats <span class="contador-pestana" data-n-beats></span>
+      </button>
+      <button type="button" role="tab" id="t-cuenta" aria-controls="p-cuenta" aria-selected="false" tabindex="-1" data-pestana="cuenta">cuenta</button>
+    </div>
+
+    <!-- ===================== Perfil ===================== -->
+    <section id="p-perfil" class="hoja seccion" role="tabpanel" aria-labelledby="t-perfil" data-seccion="perfil">
+      <form class="formulario" data-form-perfil novalidate>
+        <div class="foto-editor">
+          <div class="foto-editor__marco" data-foto-marco>
+            <img data-foto-img alt="Tu foto, como se verá en la web" hidden />
+            <span class="foto-editor__inicial" data-foto-inicial aria-hidden="true"></span>
+          </div>
+          <div class="foto-editor__texto">
+            <p class="campo__etiqueta">foto</p>
+            <p class="ayuda">
+              Opcional. En la web se ve en blanco y negro con grano, venga como venga. Si muestra tu cara es un dato
+              sensible: súbela solo si quieres.
+            </p>
+            <div class="acciones">
+              <label class="boton boton--secundario boton--chico archivo">
+                <span data-foto-boton>elegir foto</span>
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/*" data-foto-input />
+              </label>
+              <button type="button" class="enlace-boton" data-foto-quitar hidden>quitar foto</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="f-nombre">nombre artístico</label>
+            <input id="f-nombre" name="nombre" maxlength="40" required autocomplete="off" />
+          </div>
+          <div class="campo">
+            <label for="f-ciudad">ciudad</label>
+            <input id="f-ciudad" name="ciudad" maxlength="40" autocomplete="address-level2" />
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="f-abrebocas">abrebocas</label>
+          <input id="f-abrebocas" name="abrebocas" maxlength="140" />
+          <p class="campo__pie"><span>Una frase. Es lo que se lee en tu ficha de la lista de productores.</span><span class="campo__cuenta" data-cuenta-de="f-abrebocas"></span></p>
+        </div>
+
+        <div class="campo">
+          <label for="f-bio">presentación</label>
+          <textarea id="f-bio" name="bio" maxlength="900"></textarea>
+          <p class="campo__pie"><span>Quién eres, de dónde viene tu sonido, con quién has trabajado.</span><span class="campo__cuenta" data-cuenta-de="f-bio"></span></p>
+        </div>
+
+        <fieldset class="grupo">
+          <legend>estilos <span class="ayuda">(hasta tres)</span></legend>
+          <div class="chips" data-chips></div>
+        </fieldset>
+
+        <fieldset class="grupo">
+          <legend>tu color</legend>
+          <p class="ayuda">
+            Es el fondo de tu perfil y el de tus detalles: el marco de tu foto, las estrellas y la onda del beat que
+            suena. Si no eliges ninguno, tu perfil va en el rojo de MusicMafia.
+          </p>
+          <div class="colores-elegir" data-colores></div>
+        </fieldset>
+
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="f-instagram">instagram</label>
+            <div class="prefijo"><span>@</span><input id="f-instagram" name="instagram" maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false" /></div>
+          </div>
+          <div class="campo">
+            <label for="f-correo">correo de contacto</label>
+            <input id="f-correo" name="correo_contacto" type="email" maxlength="120" inputmode="email" autocomplete="email" />
+          </div>
+        </div>
+        <p class="ayuda">Pon al menos uno de estos dos: así te escriben quienes quieran usar un beat.</p>
+
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="f-youtube">youtube <span class="ayuda">(opcional)</span></label>
+            <input id="f-youtube" name="youtube" maxlength="200" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="@tucanal o el enlace de tu canal" />
+          </div>
+          <div class="campo">
+            <label for="f-spotify">spotify <span class="ayuda">(opcional)</span></label>
+            <input id="f-spotify" name="spotify" maxlength="200" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="enlace de tu perfil de artista" />
+          </div>
+        </div>
+        <p class="ayuda">Si los dejas vacíos, no aparecen en tu perfil.</p>
+
+        <p class="mensaje" data-mensaje hidden></p>
+        <div class="acciones">
+          <button class="boton" type="submit">guardar perfil</button>
+          <span class="ayuda" data-guardado aria-live="polite"></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===================== Beats ===================== -->
+    <section id="p-beats" class="hoja seccion" role="tabpanel" aria-labelledby="t-beats" data-seccion="beats" hidden>
+      <div class="beats-cabecera">
+        <div>
+          <h2 class="hoja__titulo">tus beats</h2>
+          <p class="ayuda" data-tope></p>
+        </div>
+        <button type="button" class="boton" data-nuevo-beat>subir un beat</button>
+      </div>
+
+      <form class="formulario beat-form" data-form-beat hidden novalidate>
+        <h3 class="beat-form__titulo" data-beat-form-titulo>nuevo beat</h3>
+        <div class="campo" data-campo-audio>
+          <p class="recomendacion">
+            <strong>Recomendación: sube un fragmento, no el beat completo.</strong> Con un minuto (mejor con tu tag de voz)
+            basta para que se entienda tu sonido. Todo lo que suena en una página se puede grabar: el beat entero
+            guárdalo para quien te escriba.
+          </p>
+          <span class="campo__etiqueta">audio</span>
+          <div class="acciones">
+            <label class="boton boton--secundario boton--chico archivo">
+              <span>elegir archivo</span>
+              <input type="file" accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,.mp3,.m4a,.wav" data-audio-input />
+            </label>
+            <span class="ayuda" data-audio-nombre>MP3, M4A o WAV, hasta 50 MB.</span>
+          </div>
+        </div>
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="b-titulo">título</label>
+            <input id="b-titulo" maxlength="60" required autocomplete="off" />
+          </div>
+          <div class="campo">
+            <label for="b-genero">género</label>
+            <select id="b-genero" required data-select-genero></select>
+          </div>
+        </div>
+        <div class="portada-editor">
+          <div class="portada-editor__marco"><img data-portada-img alt="" hidden /></div>
+          <div>
+            <p class="campo__etiqueta">portada</p>
+            <p class="ayuda">Opcional. Cuadrada se ve mejor; si no, se recorta al centro.</p>
+            <div class="acciones">
+              <label class="boton boton--secundario boton--chico archivo">
+                <span>elegir imagen</span>
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/*" data-portada-input />
+              </label>
+              <button type="button" class="enlace-boton" data-portada-quitar hidden>quitar portada</button>
+            </div>
+          </div>
+        </div>
+        <div class="progreso" data-progreso hidden>
+          <span data-progreso-texto>subiendo…</span>
+          <div class="progreso__barra"><span></span></div>
+        </div>
+        <p class="mensaje" data-mensaje hidden></p>
+        <div class="acciones">
+          <button class="boton" type="submit">guardar beat</button>
+          <button class="boton boton--secundario" type="button" data-cancelar-beat>cancelar</button>
+        </div>
+      </form>
+
+      <ol class="lista-beats" data-lista-beats></ol>
+      <p class="vacio-panel" data-sin-beats hidden>Aún no has subido beats.</p>
+
+      <template data-tpl-beat>
+        <li class="fila-beat">
+          <button type="button" class="fila-beat__tocar" data-escuchar>
+            <img class="fila-beat__portada" alt="" width="64" height="64" />
+            <span class="fila-beat__icono" aria-hidden="true">▶</span>
+          </button>
+          <div class="fila-beat__texto">
+            <span class="fila-beat__titulo" data-titulo></span>
+            <span class="fila-beat__meta" data-meta></span>
+            <span class="etiqueta fila-beat__oculto" data-oculto hidden>retirado por musicmafia</span>
+          </div>
+          <div class="fila-beat__acciones">
+            <button type="button" class="fila-beat__mover" data-arriba>
+              <span aria-hidden="true">↑</span><span class="solo-lectores">subir en la lista</span>
+            </button>
+            <button type="button" class="fila-beat__mover" data-abajo>
+              <span aria-hidden="true">↓</span><span class="solo-lectores">bajar en la lista</span>
+            </button>
+            <button type="button" class="boton boton--secundario boton--chico" data-editar>editar</button>
+            <button type="button" class="boton boton--secundario boton--chico" data-quitar>quitar</button>
+          </div>
+        </li>
+      </template>
+      <audio data-reproductor preload="none"></audio>
+    </section>
+
+    <!-- ===================== Cuenta ===================== -->
+    <section id="p-cuenta" class="hoja seccion cuenta" role="tabpanel" aria-labelledby="t-cuenta" data-seccion="cuenta" hidden>
+      <div class="bloque">
+        <h2 class="bloque__titulo">correo de acceso</h2>
+        <p data-correo-acceso class="dato"></p>
+        <p class="ayuda">
+          Para cambiarlo, escríbenos a <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a> desde este correo.
+        </p>
+      </div>
+
+      <form class="bloque formulario" data-form-clave novalidate>
+        <h2 class="bloque__titulo">cambiar contraseña</h2>
+        <div class="fila-campos">
+          <div class="campo">
+            <label for="c-clave">contraseña nueva</label>
+            <input id="c-clave" type="password" autocomplete="new-password" minlength="10" />
+          </div>
+          <div class="campo">
+            <label for="c-clave2">repítela</label>
+            <input id="c-clave2" type="password" autocomplete="new-password" minlength="10" />
+          </div>
+        </div>
+        <p class="mensaje" data-mensaje hidden></p>
+        <div class="acciones"><button class="boton boton--secundario" type="submit">cambiar contraseña</button></div>
+      </form>
+
+      <div class="bloque">
+        <h2 class="bloque__titulo">novedades</h2>
+        <label class="interruptor">
+          <input type="checkbox" data-novedades />
+          <span>Quiero recibir por correo novedades, convocatorias y oportunidades de MusicMafia.</span>
+        </label>
+        <p class="ayuda" data-novedades-estado aria-live="polite"></p>
+      </div>
+
+      <div class="bloque">
+        <h2 class="bloque__titulo">tus datos</h2>
+        <p class="ayuda">
+          Descarga en un archivo todo lo que guardamos sobre ti: perfil, beats y la constancia de lo que aceptaste. Los
+          audios y las imágenes van como enlaces.
+        </p>
+        <div class="acciones"><button type="button" class="boton boton--secundario" data-descargar>descargar mis datos</button></div>
+      </div>
+
+      <div class="bloque peligro">
+        <h2 class="bloque__titulo">borrar mi cuenta</h2>
+        <p>
+          Se borran tu perfil, tus beats, tus fotos y tus audios, y tu perfil deja de verse en la web en pocos minutos.
+          No se puede deshacer. Solo guardamos la constancia de lo que aceptaste durante {LEGAL.aniosConstancia} años,
+          como pide la ley.
+        </p>
+        <div class="campo">
+          <label for="c-confirmar">para confirmar, escribe tu enlace: <strong data-enlace-confirmar></strong></label>
+          <input id="c-confirmar" autocomplete="off" autocapitalize="off" spellcheck="false" data-confirmar />
+        </div>
+        <p class="mensaje" data-mensaje hidden></p>
+        <div class="acciones"><button type="button" class="boton boton--peligro" data-borrar-cuenta disabled>borrar mi cuenta</button></div>
+      </div>
+    </section>
+  </div>
+</Panel>
+
+<script>
+  import '../scripts/panel/panel';
+</script>
+
+<style>
+  .panel-productor {
+    max-width: 980px;
+  }
+
+  .cabecera-panel {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 3vw, 28px);
+    margin-bottom: 28px;
+  }
+
+  .cabecera-panel__foto {
+    position: relative;
+    flex: none;
+    width: clamp(72px, 12vw, 112px);
+    aspect-ratio: 4 / 5;
+    border: 5px solid var(--marca);
+    display: grid;
+    place-items: center;
+    background: var(--negro);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+    color: var(--blanco);
+    font-size: clamp(3rem, 7vw, 4.5rem);
+    font-weight: 900;
+    font-stretch: 75%;
+    line-height: 1;
+    transform: rotate(-3deg);
+  }
+
+  /* La foto en blanco y negro va en una capa aparte, para que el filtro no apague el marco de su color. */
+  .cabecera-panel__foto::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--foto, none) center / cover no-repeat;
+    filter: grayscale(1) contrast(1.3);
+  }
+
+  .cabecera-panel__nombre {
+    font-size: clamp(2.75rem, 8vw, 5.5rem);
+    font-weight: 900;
+    font-stretch: 82%;
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    overflow-wrap: anywhere;
+  }
+
+  .cabecera-panel__enlace {
+    margin-top: 10px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- Estado del perfil ---------- */
+  .estado {
+    display: grid;
+    gap: 12px;
+    padding-right: clamp(80px, 14vw, 140px);
+  }
+
+  .estado :global(.estado__estrella) {
+    position: absolute;
+    top: -22px;
+    right: 18px;
+    width: clamp(70px, 11vw, 110px);
+    height: auto;
+    color: var(--acento);
+    transform: rotate(10deg);
+  }
+
+  .estado[data-de='publicado'] :global(.estado__estrella) {
+    color: var(--negro);
+  }
+
+  .estado__titulo {
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 900;
+    font-stretch: 85%;
+  }
+
+  .estado__texto {
+    max-width: 62ch;
+  }
+
+  .estado__faltan {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding-left: 1.2em;
+    font-weight: 600;
+  }
+
+  .reaceptar {
+    margin-top: 28px;
+    border: 3px solid var(--negro);
+  }
+
+  /* ---------- Pestañas ---------- */
+  .seccion {
+    margin-top: 0 !important;
+  }
+
+  /* ---------- Foto ---------- */
+  .foto-editor,
+  .portada-editor {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 20px;
+  }
+
+  .foto-editor__marco {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 132px;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--negro);
+  }
+
+  .foto-editor__marco img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.35) brightness(1.05);
+  }
+
+  .foto-editor__marco::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--grano);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .foto-editor__inicial {
+    color: var(--blanco);
+    font-size: 5.5rem;
+    font-weight: 900;
+    font-stretch: 75%;
+    line-height: 1;
+  }
+
+  .foto-editor__texto {
+    display: grid;
+    gap: 8px;
+  }
+
+  .portada-editor__marco {
+    width: 96px;
+    aspect-ratio: 1;
+    border: 2px solid var(--negro);
+    background: var(--hoja-2) url('/portada-generica.svg') center / cover;
+  }
+
+  .portada-editor__marco img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---------- Beats ---------- */
+  .beats-cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .beat-form {
+    margin-top: 24px;
+    padding: 20px;
+    border: 2px dashed var(--negro);
+    background: var(--hoja-2);
+  }
+
+  .beat-form__titulo {
+    font-size: 1.5rem;
+  }
+
+  /* El consejo de subir fragmentos: una tira negra que no se pasa por alto. */
+  .recomendacion {
+    margin-bottom: 8px;
+    padding: 12px 14px;
+    background: var(--negro);
+    color: var(--claro);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .recomendacion strong {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--acento);
+    font-weight: 800;
+  }
+
+  .lista-beats {
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--negro);
+  }
+
+  .fila-beat {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--negro);
+  }
+
+  .fila-beat__tocar {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: 0;
+    background: var(--negro);
+    cursor: pointer;
+  }
+
+  .fila-beat__portada {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .fila-beat__icono {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--blanco);
+    font-size: 1.25rem;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transition: opacity 140ms ease;
+  }
+
+  .fila-beat__tocar:hover .fila-beat__icono,
+  .fila-beat__tocar:focus-visible .fila-beat__icono,
+  .fila-beat[data-sonando] .fila-beat__icono {
+    opacity: 1;
+  }
+
+  .fila-beat__texto {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .fila-beat__titulo {
+    overflow: hidden;
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fila-beat__meta {
+    color: var(--texto-2);
+    font-size: var(--t-chica);
+    font-weight: 600;
+  }
+
+  .fila-beat__oculto {
+    justify-self: start;
+    background: var(--rojo-hondo);
+    color: var(--blanco);
+  }
+
+  .fila-beat__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .fila-beat__mover {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--negro);
+    background: transparent;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .fila-beat__mover:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  /* ---------- Cuenta ---------- */
+  .cuenta {
+    display: grid;
+    gap: 0;
+  }
+
+  .bloque {
+    display: grid;
+    gap: 12px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--negro);
+  }
+
+  .bloque:first-child {
+    padding-top: 0;
+  }
+
+  .bloque.peligro {
+    margin-top: 28px;
+    padding: 20px;
+    border: 2px solid var(--negro);
+  }
+
+  .bloque__titulo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-stretch: 85%;
+  }
+
+  .peligro .bloque__titulo {
+    color: var(--negro);
+  }
+
+  .dato {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 640px) {
+    .estado {
+      padding-right: clamp(20px, 3.5vw, 36px);
+      padding-top: 56px;
+    }
+
+    .fila-beat {
+      grid-template-columns: 56px minmax(0, 1fr);
+    }
+
+    .fila-beat__tocar {
+      width: 56px;
+      height: 56px;
+    }
+
+    .fila-beat__acciones {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
+
+    .foto-editor,
+    .portada-editor {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+// Forma de onda en dos capas: la base gris y la parte ya escuchada, recortada con --p (0 a 1).
+interface Props {
+  picos: number[];
+  barras?: number;
+}
+const { picos, barras = 120 } = Astro.props;
+const remuestreo = Array.from({ length: barras }, (_, i) => {
+  const a = Math.floor((i * picos.length) / barras);
+  const b = Math.max(a + 1, Math.floor(((i + 1) * picos.length) / barras));
+  return Math.max(...picos.slice(a, b));
+});
+const ancho = barras * 10;
+const d = remuestreo
+  .map((v, i) => {
+    const h = Math.max(8, v * 0.92);
+    return `M${i * 10 + 5} ${(50 - h / 2).toFixed(1)}V${(50 + h / 2).toFixed(1)}`;
+  })
+  .join('');
+---
+<span class="onda__capas" aria-hidden="true">
+  <svg class="onda__svg onda__base" viewBox={`0 0 ${ancho} 100`} preserveAspectRatio="none" focusable="false"><path d={d} /></svg>
+  <span class="onda__hecha">
+    <svg class="onda__svg" viewBox={`0 0 ${ancho} 100`} preserveAspectRatio="none" focusable="false"><path d={d} /></svg>
+  </span>
+</span>
+
+<style>
+  .onda__capas {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    container-type: inline-size;
+  }
+
+  .onda__svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .onda__svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  @container (min-width: 480px) {
+    .onda__svg path { stroke-width: 2.6px; }
+  }
+
+  @container (min-width: 720px) {
+    .onda__svg path { stroke-width: 3.4px; }
+  }
+
+  .onda__base {
+    color: var(--onda-base, #b9b5ae);
+  }
+
+  .onda__hecha {
+    position: absolute;
+    inset: 0;
+    color: var(--onda-hecha, var(--negro));
+    clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0);
+  }
+</style>

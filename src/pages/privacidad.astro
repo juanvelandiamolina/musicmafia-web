@@ -1,0 +1,87 @@
+---
+// Política de privacidad: la versión clara y corta. Lo formal (derechos, plazos, procedimiento) está en /tratamiento-de-datos.
+import Legal from '../layouts/Legal.astro';
+import TablaLegal from '../components/TablaLegal.astro';
+import { SITIO, gmail } from '../lib/sitio';
+import { LEGAL, DATOS, ENCARGADOS } from '../lib/legal';
+---
+<Legal titulo="Política de privacidad" descripcion="Qué datos guarda MusicMafia, para qué, cuánto tiempo y con quién.">
+  <section class="resumen" aria-labelledby="t-resumen">
+    <h2 id="t-resumen">En pocas palabras</h2>
+    <ul>
+      <li>Si solo visitas la web, no te pedimos nada y no usamos cookies para seguirte.</li>
+      <li>Si eres productor, guardamos lo justo para tu cuenta y tu perfil, y lo que publicas es público porque así lo decides.</li>
+      <li>No vendemos ni cedemos datos a nadie, y no hay publicidad.</li>
+      <li>Si cierras tu cuenta, tu perfil desaparece de la web en pocos minutos y tus datos se borran en un máximo de {LEGAL.diasBorrado} días.</li>
+      <li>Puedes pedir ver, corregir o borrar tus datos cuando quieras en <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a>.</li>
+    </ul>
+  </section>
+
+  <h2 id="que-guardamos">Qué guardamos y durante cuánto tiempo</h2>
+  <TablaLegal
+    descripcion="Datos que guarda MusicMafia, para qué y cuánto tiempo"
+    columnas={[
+      { clave: 'quien', titulo: 'De quién' },
+      { clave: 'datos', titulo: 'Qué datos' },
+      { clave: 'para', titulo: 'Para qué' },
+      { clave: 'cuanto', titulo: 'Cuánto tiempo' },
+    ]}
+    filas={DATOS as unknown as Record<string, string>[]}
+  />
+
+  <h2 id="publico">Qué es público y qué no</h2>
+  <p>
+    Si eres productor, todo lo que pones en tu perfil se ve en la web: nombre artístico, ciudad, presentación, foto,
+    géneros, beats, tu usuario de Instagram, tu correo de contacto y, si los pones, tus enlaces de YouTube y Spotify.
+    Usa como correo de contacto uno que no te importe mostrar. El correo con el que entras a tu cuenta no se publica nunca.
+  </p>
+  <p>
+    Los beats se escuchan en la web, y cualquier cosa que suena en una página se puede grabar. Te recomendamos subir
+    versiones de muestra, por ejemplo con tu tag de voz, y no los archivos originales.
+  </p>
+
+  <h2 id="con-quien">Con quién compartimos datos</h2>
+  <p>
+    Solo con los proveedores que hacen funcionar la web. Tratan los datos por nuestra cuenta, y sus servidores están
+    fuera de Colombia:
+  </p>
+  <TablaLegal
+    descripcion="Proveedores de MusicMafia"
+    columnas={[
+      { clave: 'nombre', titulo: 'Proveedor' },
+      { clave: 'pais', titulo: 'Dónde' },
+      { clave: 'funcion', titulo: 'Qué hace' },
+      { clave: 'privacidad', titulo: 'Privacidad' },
+    ]}
+    filas={ENCARGADOS as unknown as Record<string, string>[]}
+    enlace="privacidad"
+  />
+  <p>
+    Solo daríamos datos a una autoridad si una orden válida nos obliga.
+  </p>
+
+  <h2 id="novedades">Correos de novedades</h2>
+  <p>
+    Solo te escribimos con novedades, convocatorias u oportunidades si lo permitiste al activar tu cuenta. Puedes
+    retirar el permiso desde tu panel o escribiéndonos, y dejarás de recibirlos. Los correos sobre tu cuenta, como la
+    invitación o un cambio de contraseña, no dependen de ese permiso.
+  </p>
+
+  <h2 id="derechos">Tus derechos</h2>
+  <p>
+    Puedes conocer, actualizar, corregir y borrar tus datos, pedir prueba de tu autorización y revocarla. Los plazos y
+    el procedimiento están en la <a href="/tratamiento-de-datos">Política de tratamiento de datos personales</a>. Si no
+    quedas conforme, puedes acudir a la Superintendencia de Industria y Comercio.
+  </p>
+
+  <h2 id="cookies">Cookies</h2>
+  <p>
+    No usamos cookies de publicidad ni de seguimiento. Lo que guardamos en tu dispositivo, y cómo cambiar tu elección,
+    está en la <a href="/cookies">Política de cookies</a>.
+  </p>
+
+  <h2 id="menores">Menores de edad</h2>
+  <p>
+    Cualquiera puede escuchar la web, pero las cuentas de productor son solo para mayores de {LEGAL.edadMinima} años.
+  </p>
+</Legal>

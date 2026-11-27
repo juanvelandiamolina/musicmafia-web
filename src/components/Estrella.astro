@@ -1,0 +1,33 @@
+---
+// Estrella recortada a mano: puntas desiguales. La forma sale de la semilla, así cada una es distinta pero estable.
+// Color con currentColor. Siempre decorativa.
+interface Props {
+  semilla: string;
+  class?: string;
+  puntas?: number;
+}
+const { semilla, class: clase, puntas = 5 } = Astro.props;
+
+let h = 2166136261;
+for (const c of semilla) {
+  h ^= c.charCodeAt(0);
+  h = Math.imul(h, 16777619);
+}
+let s = h >>> 0 || 1;
+const R = () => {
+  s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0;
+  return s / 4294967296;
+};
+const giro = R() * 360;
+const pts: string[] = [];
+for (let i = 0; i < puntas * 2; i++) {
+  const ext = i % 2 === 0;
+  const r = ext ? 50 * (0.86 + R() * 0.14) : 50 * 0.4 * (0.85 + R() * 0.3);
+  const a = ((giro + (i * 180) / puntas + (R() - 0.5) * 7) * Math.PI) / 180;
+  pts.push(`${(r * Math.sin(a)).toFixed(1)} ${(-r * Math.cos(a)).toFixed(1)}`);
+}
+const d = `M${pts.join('L')}Z`;
+---
+<svg class:list={['estrella', clase]} viewBox="-50 -50 100 100" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <path d={d} fill="currentColor" />
+</svg>

@@ -1,0 +1,45 @@
+---
+// Las casillas que acepta un productor (al activar su cuenta o cuando cambian los documentos), con su aviso de
+// privacidad. Salen de src/lib/legal.ts, igual que la vista que muestran los Términos.
+import { ACEPTACIONES, AVISO_PRIVACIDAD } from '../lib/legal';
+
+interface Props {
+  /** Prefijo de los id, por si hay dos juegos de casillas en la misma página. */
+  id?: string;
+  /** Sin la casilla de novedades (cuando solo se piden de nuevo las obligatorias). */
+  soloObligatorias?: boolean;
+}
+const { id = 'acepto', soloObligatorias = false } = Astro.props;
+
+const ENLACES: [string, string][] = [
+  ['Términos y condiciones', '/terminos'],
+  ['Política de tratamiento de datos personales', '/tratamiento-de-datos'],
+];
+const conEnlaces = (texto: string) =>
+  ENLACES.reduce(
+    (t, [frase, href]) => t.replace(frase, `<a href="${href}" target="_blank" rel="noopener">${frase}</a>`),
+    texto,
+  );
+const casillas = ACEPTACIONES.filter((a) => a.obligatoria || !soloObligatorias);
+---
+<ul class="casillas-aceptar">
+  {casillas.map((a) => (
+    <li>
+      <label for={`${id}-${a.id}`}>
+        <input
+          id={`${id}-${a.id}`}
+          type="checkbox"
+          name="casilla"
+          value={a.id}
+          required={a.obligatoria}
+          data-obligatoria={a.obligatoria ? '' : undefined}
+        />
+        <span>
+          <Fragment set:html={conEnlaces(a.texto)} />
+          <small>{a.obligatoria ? 'obligatoria' : 'opcional'}</small>
+        </span>
+      </label>
+    </li>
+  ))}
+</ul>
+<p class="ayuda">{AVISO_PRIVACIDAD}</p>

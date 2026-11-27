@@ -1,0 +1,211 @@
+---
+// Política de Tratamiento de la Información (Ley 1581 de 2012; Decreto 1377 de 2013, compilado en el Decreto 1074 de 2015).
+import Legal from '../layouts/Legal.astro';
+import TablaLegal from '../components/TablaLegal.astro';
+import { SITIO, gmail } from '../lib/sitio';
+import { LEGAL, DATOS, ENCARGADOS, RESPONSABLE_TEXTO, fechaLarga } from '../lib/legal';
+
+const indice = [
+  { id: 'responsable', titulo: 'Responsable' },
+  { id: 'alcance', titulo: 'A quién aplica' },
+  { id: 'definiciones', titulo: 'Definiciones' },
+  { id: 'principios', titulo: 'Principios' },
+  { id: 'datos', titulo: 'Datos, finalidades y conservación' },
+  { id: 'sensibles', titulo: 'Datos sensibles y de menores' },
+  { id: 'autorizacion', titulo: 'Autorización' },
+  { id: 'proveedores', titulo: 'Proveedores y envío al exterior' },
+  { id: 'derechos', titulo: 'Tus derechos' },
+  { id: 'ejercer', titulo: 'Cómo ejercerlos' },
+  { id: 'seguridad', titulo: 'Seguridad' },
+  { id: 'vigencia', titulo: 'Vigencia y cambios' },
+];
+---
+<Legal
+  titulo="Tratamiento de datos personales"
+  descripcion="Política de tratamiento de datos personales de MusicMafia, según la Ley 1581 de 2012."
+  indice={indice}
+>
+  <p>
+    Esta política explica cómo MusicMafia recoge, usa, guarda y borra datos personales, y cómo puedes ejercer tus
+    derechos sobre ellos. Cumple la Ley 1581 de 2012 y el Decreto 1377 de 2013, compilado en el Decreto 1074 de 2015.
+  </p>
+
+  <h2 id="responsable">1. Responsable</h2>
+  <p>
+    El responsable del tratamiento es {RESPONSABLE_TEXTO}, que opera la web MusicMafia ({SITIO.dominio}). Domicilio:
+    {SITIO.responsable.direccion}. Correo: <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a>.
+    Teléfono: {SITIO.contacto.telefono}.
+  </p>
+  <p>
+    El propio responsable atiende las consultas y reclamos sobre datos personales, por los canales anteriores.
+  </p>
+
+  <h2 id="alcance">2. A quién aplica</h2>
+  <ul>
+    <li><strong>Productores:</strong> las personas invitadas que tienen una cuenta y publican su perfil y sus beats.</li>
+    <li><strong>Quienes escriben a MusicMafia</strong> por correo o teléfono.</li>
+    <li><strong>Visitantes</strong> que navegan por la web sin cuenta.</li>
+  </ul>
+  <p>
+    Cuando un visitante escribe a un productor desde su perfil (Instagram o correo), esa conversación ocurre fuera de
+    MusicMafia y los datos que se intercambien quedan bajo la responsabilidad de quien los recibe.
+  </p>
+
+  <h2 id="definiciones">3. Definiciones</h2>
+  <ul>
+    <li><strong>Titular:</strong> la persona a la que se refieren los datos.</li>
+    <li><strong>Dato personal:</strong> cualquier información que identifica o permite identificar a una persona.</li>
+    <li><strong>Dato sensible:</strong> el que afecta la intimidad o puede dar lugar a discriminación, como los datos biométricos.</li>
+    <li><strong>Tratamiento:</strong> cualquier operación con datos: recogerlos, guardarlos, usarlos, publicarlos o borrarlos.</li>
+    <li><strong>Responsable:</strong> quien decide sobre el tratamiento. Aquí, el indicado en el numeral 1.</li>
+    <li><strong>Encargado:</strong> quien trata datos por cuenta del responsable, como un proveedor de alojamiento.</li>
+    <li><strong>Autorización:</strong> el consentimiento previo, expreso e informado del titular.</li>
+    <li><strong>Transmisión:</strong> el envío de datos a un encargado, en Colombia o en el exterior, para que los trate por cuenta del responsable.</li>
+  </ul>
+
+  <h2 id="principios">4. Principios</h2>
+  <p>
+    MusicMafia trata los datos con legalidad, finalidad, libertad, veracidad, transparencia, acceso y circulación
+    restringida, seguridad y confidencialidad. En la práctica: pide solo lo necesario, lo usa solo para lo que dijo,
+    no lo vende ni lo cede, y lo borra cuando deja de hacer falta.
+  </p>
+
+  <h2 id="datos">5. Datos, finalidades y conservación</h2>
+  <p>Estos son todos los datos que se tratan, para qué y durante cuánto tiempo se conservan:</p>
+  <TablaLegal
+    descripcion="Datos que trata MusicMafia, finalidad y tiempo de conservación"
+    columnas={[
+      { clave: 'quien', titulo: 'De quién' },
+      { clave: 'datos', titulo: 'Qué datos' },
+      { clave: 'para', titulo: 'Para qué' },
+      { clave: 'cuanto', titulo: 'Cuánto tiempo' },
+    ]}
+    filas={DATOS as unknown as Record<string, string>[]}
+  />
+  <p>
+    Los datos del perfil público (nombre artístico, ciudad, presentación, foto, géneros, Instagram, correo de contacto,
+    YouTube y Spotify si los da, y beats) los publica el productor para que cualquiera los vea. El correo con el que el productor entra a su cuenta
+    no se publica nunca.
+  </p>
+  <p>
+    MusicMafia no vende, alquila ni cede datos personales, y no los usa para publicidad de terceros.
+  </p>
+
+  <h2 id="sensibles">6. Datos sensibles y de menores</h2>
+  <p>
+    MusicMafia no pide datos sensibles. La única excepción posible es la foto de perfil: es opcional y, si muestra el
+    rostro, puede considerarse un dato biométrico. Nadie está obligado a entregarla, y el productor puede usar en su
+    lugar una imagen que no lo identifique.
+  </p>
+  <p>
+    Las cuentas de productor son solo para mayores de {LEGAL.edadMinima} años. Si llegamos a saber que una cuenta
+    pertenece a un menor de edad, la cerraremos y borraremos sus datos.
+  </p>
+
+  <h2 id="autorizacion">7. Autorización</h2>
+  <ul>
+    <li>
+      <strong>Productores:</strong> al activar su cuenta marcan, una por una, las autorizaciones que se describen en los{' '}
+      <a href="/terminos#aceptaciones">Términos y condiciones</a>. El permiso para recibir novedades es aparte, opcional y
+      viene desmarcado. Cada aceptación queda guardada con fecha, hora y versión del documento.
+    </li>
+    <li>
+      <strong>Quienes escriben:</strong> al enviar un mensaje autorizan que se use para responderles. Es una conducta que
+      no deja duda sobre su voluntad, y la ley la reconoce como forma de autorización.
+    </li>
+    <li>
+      <strong>Visitantes:</strong> los datos técnicos se usan solo en la medida necesaria para entregar la página y
+      protegerla. La medición de visitas se activa solo si el visitante la permite en el aviso de cookies.
+    </li>
+  </ul>
+  <p>
+    La autorización no se pide cuando la ley no la exige, por ejemplo ante una orden de una autoridad competente.
+  </p>
+
+  <h2 id="proveedores">8. Proveedores y envío de datos al exterior</h2>
+  <p>
+    Para funcionar, MusicMafia usa los proveedores siguientes. Actúan como encargados: tratan los datos solo para
+    prestar su servicio y con medidas de seguridad propias. Todos tienen sus servidores fuera de Colombia, así que usar
+    MusicMafia implica una transmisión internacional de datos, que el productor autoriza de forma expresa al activar su
+    cuenta.
+  </p>
+  <TablaLegal
+    descripcion="Proveedores que tratan datos por cuenta de MusicMafia"
+    columnas={[
+      { clave: 'nombre', titulo: 'Proveedor' },
+      { clave: 'pais', titulo: 'Dónde' },
+      { clave: 'funcion', titulo: 'Qué hace' },
+      { clave: 'privacidad', titulo: 'Privacidad' },
+    ]}
+    filas={ENCARGADOS as unknown as Record<string, string>[]}
+    enlace="privacidad"
+  />
+  <p>Si cambia algún proveedor, esta tabla se actualizará antes del cambio.</p>
+
+  <h2 id="derechos">9. Tus derechos</h2>
+  <p>Como titular de tus datos tienes derecho a:</p>
+  <ul>
+    <li>Conocer, actualizar y rectificar tus datos.</li>
+    <li>Pedir prueba de la autorización que diste.</li>
+    <li>Saber, si lo pides, qué uso se ha dado a tus datos.</li>
+    <li>Revocar la autorización o pedir que se borren tus datos, salvo cuando la ley o un contrato obliguen a conservarlos.</li>
+    <li>Acceder gratis a tus datos.</li>
+    <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</li>
+  </ul>
+  <p>
+    Los productores pueden actualizar sus datos y borrar su cuenta directamente desde su panel, sin pedir permiso a
+    nadie.
+  </p>
+
+  <h2 id="ejercer">10. Cómo ejercer tus derechos</h2>
+  <p>
+    Escribe a <a href={gmail(SITIO.contacto.correo)} target="_blank" rel="noopener noreferrer">{SITIO.contacto.correo}</a> con tu nombre, lo que pides y un
+    medio para responderte. Si eres productor, escribe desde el correo de tu cuenta: así podemos confirmar que eres tú.
+    Pueden presentar la solicitud el titular, sus causahabientes, su representante o apoderado, o quien actúe a su
+    favor por estipulación de otro.
+  </p>
+  <h3>Consultas</h3>
+  <p>
+    Para saber qué datos tuyos tenemos o cómo los usamos. Se responden en un máximo de 10 días hábiles. Si no es
+    posible en ese plazo, te diremos por qué y responderemos en los 5 días hábiles siguientes.
+  </p>
+  <h3>Reclamos</h3>
+  <p>
+    Para corregir, actualizar o borrar datos, o si crees que se incumplió la ley. Incluye tu identificación, la
+    descripción de los hechos, tu dirección y los documentos que quieras aportar.
+  </p>
+  <ul>
+    <li>Si falta información, te la pediremos dentro de los 5 días hábiles siguientes. Si pasan 2 meses sin respuesta, se entiende que desististe.</li>
+    <li>En un máximo de 2 días hábiles marcaremos tus datos con la leyenda «reclamo en trámite» hasta resolverlo.</li>
+    <li>Se responde en un máximo de 15 días hábiles. Si no es posible, te diremos por qué y responderemos en los 8 días hábiles siguientes.</li>
+  </ul>
+  <h3>Queja ante la SIC</h3>
+  <p>
+    Si no quedas conforme con la respuesta, puedes acudir a la Superintendencia de Industria y Comercio. La ley pide
+    haber presentado antes la consulta o el reclamo a MusicMafia.
+  </p>
+
+  <h2 id="seguridad">11. Seguridad</h2>
+  <ul>
+    <li>Todas las conexiones con la web van cifradas (HTTPS).</li>
+    <li>Las contraseñas las guarda cifradas el proveedor de acceso; nadie puede leerlas.</li>
+    <li>La base de datos tiene reglas que impiden que un productor vea o cambie lo de otro.</li>
+    <li>Solo el responsable tiene acceso de administración.</li>
+    <li>Cada semana se hace una copia de seguridad de la base de datos, en un repositorio privado; cada copia se borra sola a los {LEGAL.diasBorrado} días.</li>
+    <li>Se pide el mínimo de datos necesario.</li>
+  </ul>
+  <p>
+    Ningún sistema es infalible. Si ocurre un incidente que afecte tus datos, te avisaremos y lo informaremos a la SIC
+    como exige la ley.
+  </p>
+
+  <h2 id="vigencia">12. Vigencia y cambios</h2>
+  <p>
+    Esta política rige desde el {fechaLarga(LEGAL.vigenteDesde)}. Las bases de datos estarán vigentes mientras
+    MusicMafia funcione y, después, solo durante los plazos de conservación del numeral 5.
+  </p>
+  <p>
+    Si la cambiamos de forma importante, avisaremos a los productores por correo con al menos {LEGAL.diasAviso} días de
+    anticipación y, si el cambio afecta a lo que autorizaron, les pediremos una nueva autorización.
+  </p>
+</Legal>

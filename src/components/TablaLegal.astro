@@ -1,0 +1,107 @@
+---
+// Tabla de los documentos legales. En pantallas estrechas cada fila pasa a ser una ficha con sus etiquetas.
+interface Columna {
+  clave: string;
+  titulo: string;
+}
+interface Props {
+  columnas: Columna[];
+  filas: Record<string, string>[];
+  /** Columna cuyo valor es un enlace externo (se muestra la URL como "Política del proveedor"). */
+  enlace?: string;
+  descripcion: string;
+}
+const { columnas, filas, enlace, descripcion } = Astro.props;
+---
+<div class="tabla">
+  <table>
+    <caption class="solo-lectores">{descripcion}</caption>
+    <thead>
+      <tr>{columnas.map((c) => <th scope="col">{c.titulo}</th>)}</tr>
+    </thead>
+    <tbody>
+      {filas.map((f) => (
+        <tr>
+          {columnas.map((c, i) =>
+            i === 0 ? (
+              <th scope="row" data-etiqueta={c.titulo}>{f[c.clave]}</th>
+            ) : (
+              <td data-etiqueta={c.titulo}>
+                {c.clave === enlace ? <a href={f[c.clave]} target="_blank" rel="noopener noreferrer">Política del proveedor</a> : f[c.clave]}
+              </td>
+            ),
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .tabla {
+    margin: 24px 0 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  th,
+  td {
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--linea);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    padding-top: 0;
+    color: var(--tinta-2);
+    font-size: var(--t-micro);
+    font-weight: 600;
+  }
+
+  tbody th {
+    color: var(--tinta-fuerte);
+    font-weight: 600;
+  }
+
+  td a {
+    color: var(--tinta-fuerte);
+  }
+
+  @media (max-width: 640px) {
+    thead {
+      display: none;
+    }
+    table,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+    }
+    tr {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--linea);
+    }
+    th,
+    td {
+      padding: 0;
+      border: 0;
+    }
+    td {
+      margin-top: 8px;
+    }
+    td::before {
+      content: attr(data-etiqueta);
+      display: block;
+      color: var(--tinta-2);
+      font-size: var(--t-micro);
+      font-weight: 600;
+    }
+  }
+</style>

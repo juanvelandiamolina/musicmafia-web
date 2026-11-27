@@ -1,0 +1,91 @@
+---
+// Aviso de cookies. Oculto por defecto: el script lo muestra solo si el visitante aún no ha elegido.
+// Los dos botones pesan lo mismo a propósito: rechazar debe ser tan fácil como aceptar.
+import { CONSENTIMIENTO } from '../lib/legal';
+import { SITIO } from '../lib/sitio';
+---
+<section
+  class="cookies"
+  data-cookies
+  hidden
+  aria-label="Aviso de cookies"
+  data-clave={CONSENTIMIENTO.clave}
+  data-version={CONSENTIMIENTO.version}
+  data-dias={CONSENTIMIENTO.diasValidez}
+  data-token={SITIO.analitica.cloudflareToken}
+>
+  <p class="cookies__texto">
+    Aquí solo usamos lo necesario para que la web funcione. Si nos dejas, también contamos visitas de forma anónima y
+    sin cookies, para saber qué perfiles se escuchan más. <a href="/cookies">Más información</a>
+  </p>
+  <div class="cookies__acciones">
+    <button type="button" class="boton boton--secundario" data-eleccion="esencial">Solo lo esencial</button>
+    <button type="button" class="boton boton--secundario" data-eleccion="medicion">Permitir medición</button>
+  </div>
+</section>
+
+<script>
+  import '../scripts/cookies';
+</script>
+
+<style>
+  .cookies {
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 16px;
+    z-index: 70;
+    width: min(440px, calc(100% - 32px));
+    padding: 20px 20px 20px;
+    border: 2px solid var(--negro);
+    background: var(--hoja);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Un trozo de cinta, como si el aviso estuviera pegado a la página. */
+  .cookies::before {
+    content: '';
+    position: absolute;
+    top: -13px;
+    left: 28px;
+    width: 92px;
+    height: 24px;
+    background: rgba(236, 233, 227, 0.75);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transform: rotate(-5deg);
+  }
+
+  /* Con el reproductor abierto, el aviso sube para no taparlo. */
+  :global(body.con-barra) .cookies {
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 92px);
+  }
+
+  .cookies__texto {
+    font-size: 0.9375rem;
+    line-height: 1.47;
+  }
+
+  .cookies__texto a {
+    color: var(--negro);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .cookies__acciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .cookies__acciones .boton {
+    padding-inline: 12px;
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 640px) {
+    .cookies {
+      left: 12px;
+      width: calc(100% - 24px);
+    }
+  }
+</style>

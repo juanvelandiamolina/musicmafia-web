@@ -1,0 +1,412 @@
+---
+import Base from '../layouts/Base.astro';
+import Logo from '../components/Logo.astro';
+import Estrella from '../components/Estrella.astro';
+import FotoZine from '../components/FotoZine.astro';
+import { productores } from '../data/catalogo';
+import { SITIO, gmail } from '../lib/sitio';
+
+// Una muestra del círculo, nunca una cifra: la portada no dice cuántos son.
+const muestra = productores().slice(0, 6);
+const reglas = [
+  { titulo: 'por invitación', texto: 'Nadie se inscribe. Los productores entran cuando los invitamos, y cada perfil se revisa antes de publicarse.' },
+  { titulo: 'sin tienda', texto: 'No hay precios, licencias ni carrito. Solo música para escuchar de principio a fin.' },
+  { titulo: 'contacto directo', texto: 'Cada perfil enlaza al Instagram y al correo de su productor, y a su YouTube y su Spotify si los tiene. La conversación es entre ustedes.' },
+];
+---
+<Base seccion="inicio">
+  <section class="portada" aria-labelledby="t-portada">
+    <p class="portada__cinta contenedor repartido">
+      <span>edición 01</span><span>solo por invitación</span>
+    </p>
+
+    <div class="portada__escena">
+      <Estrella semilla="portada-01" class="portada__estrella" />
+      <Logo class="portada__logo" animado title="Logo de MusicMafia: una nota musical cuyas cabezas son las de una pareja tomada de la mano" />
+      <p class="portada__guion guion" aria-hidden="true">la familia</p>
+    </div>
+
+    <h1 id="t-portada" class="portada__titulo contenedor repartido">
+      <span>pocos.</span>{' '}<span>a</span>{' '}<span>propósito.</span>
+    </h1>
+
+    <div class="portada__pie contenedor">
+      <p class="portada__entrada">
+        MusicMafia es un círculo cerrado de productores. Cada uno entró por invitación, y cada beat que suena aquí lo eligió quien lo hizo.
+      </p>
+      <a class="boton" href="/productores">ver productores</a>
+    </div>
+  </section>
+
+  <section class="historia" aria-labelledby="t-historia">
+    <div class="historia__rejilla contenedor">
+      <h2 id="t-historia" class="historia__titulo">hay plataformas donde cabe todo. esta no es una de ellas.</h2>
+      <div class="historia__texto">
+        <p>
+          MusicMafia nació en Bogotá con una idea sencilla: reunir en un solo lugar a los productores que nos hacen detener lo que estamos haciendo para escuchar. No hay formulario de inscripción ni algoritmo que decida quién aparece. Cada nombre llega por invitación, después de escuchar su trabajo con calma.
+        </p>
+        <p>
+          Aquí no se vende nada. Los beats están para escucharse completos, como se recorre una exposición. Si algo te mueve, hablas directamente con quien lo hizo.
+        </p>
+      </div>
+      <Estrella semilla="historia" class="historia__estrella" />
+    </div>
+  </section>
+
+  <section id="asi-funciona" class="reglas" aria-labelledby="t-reglas">
+    <div class="contenedor">
+      <h2 id="t-reglas" class="reglas__titulo">así funciona</h2>
+      <ul class="reglas__lista">
+        {reglas.map((r) => (
+          <li>
+            <Estrella semilla={`regla-${r.titulo}`} class="reglas__estrella" />
+            <h3>{r.titulo}</h3>
+            <p>{r.texto}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {muestra.length > 0 && (
+  <section class="circulo" aria-labelledby="t-circulo">
+    <div class="contenedor">
+      <div class="circulo__cabecera">
+        <div>
+          <h2 id="t-circulo" class="circulo__titulo">el círculo</h2>
+          <p class="circulo__resumen">Elegidos uno por uno, escuchados con calma.</p>
+        </div>
+        <a class="boton" href="/productores">ver productores</a>
+      </div>
+      <ul class="circulo__lista">
+        {muestra.map((p) => (
+          <li style={`--marca: ${p.color}`}>
+            <a class="recorte con-viraje" href={`/${p.slug}`}>
+              <FotoZine src={p.foto} nombre={p.nombre} semilla={p.slug} class="recorte__foto" />
+              <span class="recorte__nombre">{p.nombre.toLowerCase()}</span>
+              {p.ciudad && <span class="recorte__ciudad">{p.ciudad.toLowerCase()}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  )}
+
+  <section class="entrada" aria-labelledby="t-entrada">
+    <div class="contenedor">
+      <h2 id="t-entrada" class="entrada__titulo repartido">
+        <span>¿produces?</span>{' '}<span>la</span>{' '}<span>puerta</span>{' '}<span>no</span>{' '}<span>está</span>{' '}<span>abierta.</span>
+      </h2>
+      <div class="entrada__pie">
+        <p>
+          La entrada es solo por invitación. Si crees que tu música debería estar aquí, mándanos un enlace y la escuchamos con calma.
+        </p>
+        <a class="boton" href={gmail(SITIO.contacto.correo, 'Mi música para MusicMafia')} target="_blank" rel="noopener noreferrer">escribir a {SITIO.contacto.correo}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Portada: el póster ---------- */
+  .portada {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100svh - var(--nav-alto));
+    padding: 18px 0 clamp(28px, 5vh, 56px);
+    overflow: hidden;
+  }
+
+  .portada__cinta {
+    position: relative;
+    z-index: 2;
+    font-size: var(--t-chica);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .portada__escena {
+    position: relative;
+    display: grid;
+    flex: 1;
+    place-items: center;
+    min-height: clamp(300px, 50vh, 600px);
+  }
+
+  .portada__escena :global(.portada__estrella) {
+    position: absolute;
+    top: 50%;
+    left: 55%;
+    width: clamp(340px, 66vh, 740px);
+    height: auto;
+    color: var(--hoja);
+    transform: translate(-50%, -50%) rotate(-8deg);
+  }
+
+  .portada__escena :global(.portada__logo) {
+    position: relative;
+    width: auto;
+    height: clamp(230px, 50vh, 540px);
+    color: var(--negro);
+  }
+
+  .portada__guion {
+    position: absolute;
+    left: 59%;
+    bottom: 9%;
+    color: var(--negro);
+    font-size: clamp(3.5rem, 9vw, 8.5rem);
+    transform: rotate(-10deg);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .portada__titulo {
+    margin-top: 8px;
+    font-size: clamp(3.5rem, 9.4vw, 11rem);
+    font-weight: 900;
+    font-stretch: 82%;
+    line-height: 0.82;
+    letter-spacing: -0.065em;
+  }
+
+  .portada__pie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px 40px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 2px solid var(--negro);
+  }
+
+  .portada__entrada {
+    max-width: 46ch;
+    font-size: var(--t-entrada);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  /* ---------- Historia: papel pegado sobre el rojo ---------- */
+  .historia {
+    position: relative;
+    padding: clamp(72px, 11vw, 150px) 0;
+    background: var(--hoja);
+  }
+
+  .historia__rejilla {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 40px 24px;
+  }
+
+  .historia__titulo {
+    grid-column: 1 / span 9;
+    font-size: var(--t-h2);
+    line-height: 0.95;
+  }
+
+  .historia__texto {
+    display: grid;
+    grid-column: 6 / span 7;
+    gap: 1.1em;
+    font-size: var(--t-entrada);
+    line-height: 1.45;
+  }
+
+  .historia :global(.historia__estrella) {
+    position: absolute;
+    top: -40px;
+    right: var(--margen);
+    width: clamp(110px, 16vw, 220px);
+    height: auto;
+    color: var(--acento);
+    transform: rotate(14deg);
+  }
+
+  /* ---------- Así funciona: en negativo ---------- */
+  .reglas {
+    padding: clamp(72px, 10vw, 130px) 0;
+    background: var(--negro);
+    color: var(--claro);
+  }
+
+  .reglas__titulo {
+    color: var(--acento);
+    font-size: var(--t-h2);
+  }
+
+  .reglas__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    margin: 56px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reglas__lista li {
+    padding-top: 20px;
+    border-top: 2px solid var(--claro);
+  }
+
+  .reglas__lista :global(.reglas__estrella) {
+    width: 34px;
+    height: 34px;
+    color: var(--acento);
+  }
+
+  .reglas__lista h3 {
+    margin-top: 16px;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .reglas__lista p {
+    max-width: 32ch;
+    margin-top: 12px;
+    color: var(--claro);
+    opacity: 0.85;
+  }
+
+  /* ---------- El círculo: recortes en rejilla sobre el rojo ---------- */
+  .circulo {
+    padding: clamp(72px, 10vw, 130px) 0;
+  }
+
+  .circulo__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .circulo__titulo {
+    font-size: var(--t-h1);
+    font-weight: 900;
+    font-stretch: 85%;
+  }
+
+  .circulo__resumen {
+    margin-top: 14px;
+    font-size: var(--t-entrada);
+    font-weight: 600;
+  }
+
+  .circulo__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(28px, 4vw, 56px) clamp(20px, 4vw, 64px);
+    max-width: 980px;
+    margin: 56px auto 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .recorte {
+    display: grid;
+    text-decoration: none;
+  }
+
+  .recorte :global(.recorte__foto) {
+    aspect-ratio: 1;
+    border: 6px solid var(--marca);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .circulo__lista li:nth-child(3n + 1) :global(.recorte__foto) { transform: rotate(-2.5deg); }
+  .circulo__lista li:nth-child(3n + 2) :global(.recorte__foto) { transform: rotate(1.5deg) translateY(10px); }
+  .circulo__lista li:nth-child(3n) :global(.recorte__foto) { transform: rotate(-1deg); }
+
+  .recorte:hover :global(.recorte__foto),
+  .recorte:focus-visible :global(.recorte__foto) {
+    transform: rotate(0) scale(1.03);
+  }
+
+  .recorte__nombre {
+    margin-top: 16px;
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .recorte__ciudad {
+    margin-top: 4px;
+    font-size: var(--t-chica);
+    font-weight: 600;
+  }
+
+  /* ---------- Entrada ---------- */
+  .entrada {
+    padding: clamp(72px, 10vw, 130px) 0;
+    background: var(--hoja);
+  }
+
+  .entrada__titulo {
+    font-size: clamp(2.5rem, 7vw, 6.5rem);
+    font-weight: 900;
+    font-stretch: 85%;
+    line-height: 0.9;
+  }
+
+  .entrada__pie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px 40px;
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 2px solid var(--negro);
+  }
+
+  .entrada__pie p {
+    max-width: 44ch;
+    font-size: var(--t-entrada);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 900px) {
+    .historia__titulo,
+    .historia__texto {
+      grid-column: 1 / -1;
+    }
+    .reglas__lista {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .portada__escena :global(.portada__estrella) {
+      left: 60%;
+      width: 112vw;
+    }
+    .portada__escena :global(.portada__logo) {
+      height: clamp(220px, 42vh, 380px);
+    }
+    .portada__guion {
+      left: auto;
+      right: 2%;
+      bottom: 0;
+      color: var(--hoja);
+      font-size: 3.4rem;
+    }
+    .portada__titulo {
+      font-size: 22vw;
+      justify-content: flex-start;
+      gap: 0 0.22em;
+    }
+    .circulo__lista {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .historia :global(.historia__estrella) {
+      top: -64px;
+    }
+  }
+</style>
